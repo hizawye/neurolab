@@ -1,339 +1,369 @@
 {
-  "platformInfo": {
-    "name": "NeuroLab",
-    "description": "A general-purpose, AI-powered drug discovery platform. It is designed to be a modular, intelligent, and automated system for end-to-end research workflows, from target selection and molecule generation to docking, simulation, and property prediction.",
-    "vision": "To build a powerful, modular, and partially-commercial open-source platform for AI-driven drug discovery, enabling complete automated workflows, custom agents, and end-to-end pipelines for any disease, condition, or compound family.",
-    "keyFeatures": [
-      "End-to-End Automation: Fully integrated drug discovery pipelines accessible via API or GUI.",
-      "Intelligent Agents: AI-driven agents to plan, generate, evaluate, and optimize molecular candidates.",
-      "Modular Architecture: Plug-and-play components with CLI, GUI, and API access.",
-      "Multi-Target Capable: Supports various biological targets like enzymes, receptors, and transporters (e.g., MAO-B, DAT, NMDA).",
-      "Customizable Workflows: Build and define workflows visually or via YAML/JSON configuration files.",
-      "Cross-Platform Compute: Capable of running on local machines, dedicated GPU clusters, or cloud services (GCP, AWS, Vast.ai)."
-    ],
-    "license": {
-      "type": "Business Source License (BSL-1.1)",
-      "terms": "non-converting"
-    },
-    "maintainer": {
-      "name": "Abderrahim Safou",
-      "email": "safou348@gmail.com"
-    }
-  },
-  "projectGoals": [
-    "Enable drug discovery from scratch.",
-    "Facilitate drug repurposing.",
-    "Optimize candidate properties (e.g., BBB permeability, low-toxicity).",
-    "Utilize AI agents to iterate faster than manual workflows.",
-    "Foster a synergy between open-source and commercial development."
-  ],
-  "technicalStack": {
-    "backend": {
-      "language": "Python",
-      "framework": "FastAPI"
-    },
-    "frontend": {
-      "language": "JavaScript/TypeScript",
-      "framework": "React",
-      "buildTool": "Vite",
-      "styling": "TailwindCSS",
-      "uiLibraries": [
-        "ShadCN",
-        "Recharts"
-      ],
-      "visualization": "NGL viewer"
-    },
-    "databaseAndCache": {
-      "metadata": "PostgreSQL, MongoDB",
-      "taskQueueAndCache": "Redis",
-      "storage": "Local filesystem or cloud object storage for large files (PDBs, docking results)."
-    },
-    "devOps": {
-      "containerization": "Docker, Docker Compose",
-      "versionControl": "Git, GitHub",
-      "os": "Linux/macOS recommended (Ubuntu or Fedora)"
-    },
-    "scientificAndML": {
-      "core": "RDKit, OpenMM, GROMACS",
-      "docking": "AutoDock Vina, Smina",
-      "predictionAPIs": "SwissADME, ADMETlab, ProTox-II",
-      "generativeChemistry": "MolDesigner, Chai-1",
-      "analysisAndFrameworks": "HuggingFace Transformers, LLMs for scoring"
-    }
-  },
-  "architecture": {
-    "style": "Monorepo",
-    "projectStructure": {
-      "root": "neurolab/",
-      "directories": [
-        {
-          "name": "backend/",
-          "description": "FastAPI application for serving the API.",
-          "children": [
-            {
-              "name": "api/",
-              "description": "API endpoints definition."
-            },
-            {
-              "name": "core/",
-              "description": "Agent orchestrator, workflow logic, and core business logic."
-            },
-            {
-              "name": "modules/",
-              "description": "Individual scientific modules (e.g., target_selector.py, docking_engine.py)."
-            }
-          ]
-        },
-        {
-          "name": "frontend/",
-          "description": "React and TailwindCSS for the user interface.",
-          "children": [
-            {
-              "name": "dashboard/",
-              "description": "Main dashboard component."
-            },
-            {
-              "name": "molecule_viewer/",
-              "description": "Component for 3D molecular visualization."
-            },
-            {
-              "name": "logs/",
-              "description": "Component for displaying logs."
-            }
-          ]
-        },
-        {
-          "name": "agents/",
-          "description": "Implementations of autonomous AI agents (e.g., science_planner.py)."
-        },
-        {
-          "name": "orchestrator/",
-          "description": "Task queue management using Celery for asynchronous jobs."
-        },
-        {
-          "name": "workflows/",
-          "description": "Pre-defined and custom workflow configurations (e.g., default_pipeline.json)."
-        },
-        {
-          "name": "data/",
-          "description": "Cache for molecules, results, PDBs, and other scientific data."
-        },
-        {
-          "name": "docker/",
-          "description": "Dockerfiles and Docker Compose files for building services."
-        },
-        {
-          "name": "scripts/",
-          "description": "Utility and maintenance scripts."
-        },
-        {
-          "name": "docs/",
-          "description": "Platform documentation, architecture diagrams, and specifications."
-        }
-      ],
-      "keyFiles": [
-        "README.md: Overview of the platform.",
-        "LICENSE.md: Legal terms for use and protection.",
-        "COMMERCIAL.md: Usage rules for commercial products.",
-        "CONTRIBUTING.md: How to contribute code, plugins, and data.",
-        "workflows/default_pipeline.json: Defines the steps for the default end-to-end pipeline.",
-        "agents/: Directory containing the core logic that drives workflows and decisions.",
-        "modules/: Directory containing the scientific backends that power the agents."
-      ]
-    }
-  },
-  "workflowPhilosophy": {
-    "description": "NeuroLab is not a rigid pipeline, but a flexible system where agents and modules collaborate to achieve a defined scientific outcome. Each module is API-exposed and communicates via an orchestrator layer.",
-    "useCases": [
-      {
-        "case": "Full Agent Orchestration",
-        "description": "Input a target disease or protein name and let the 'SciencePlanner' agent define the best strategy and execute the full workflow."
-      },
-      {
-        "case": "Isolated Module Execution",
-        "description": "Run modules independently, such as using the 'DockingEngine' with pre-supplied molecules or the 'PropertyPredictor' for a single compound."
-      },
-      {
-        "case": "Simulation-Only",
-        "description": "Use the 'Simulator' module to test the pharmacokinetics of an already optimized candidate."
-      },
-      {
-        "case": "Multi-Agent Experiments",
-        "description": "Chain agents like 'DataMiner', 'MoleculeEditor', and 'Evaluator' to autonomously propose, create, and validate molecular iterations."
-      }
-    ],
-    "configuration": "Workflows are configurable via JSON files in the `/workflows` directory and can be executed through the orchestrator API."
-  },
-  "coreModules": [
-    {
-      "name": "TargetSelector",
-      "purpose": "Fetches and identifies relevant biological targets based on a given disease.",
-      "input": "Disease or condition name.",
-      "output": "A list of relevant targets (e.g., protein PDB IDs).",
-      "tools": [ "RCSB API", "UniProt API", "AlphaFold DB" ]
-    },
-    {
-      "name": "LigandFinder",
-      "purpose": "Searches for and retrieves ligand molecules from chemical databases.",
-      "input": "Keyword or target name.",
-      "output": "A list of ligands in formats like SMILES.",
-      "tools": [ "PubChem (via pubchempy)", "ChEMBL API" ]
-    },
-    {
-      "name": "MolecularEditor",
-      "purpose": "Generates or modifies molecules to create new variants.",
-      "input": "A molecule in SMILES format.",
-      "output": "A modified or newly generated molecule.",
-      "tools": [ "RDKit", "MolDesigner", "Chai-1" ]
-    },
-    {
-      "name": "DockingEngine",
-      "purpose": "Performs molecular docking of ligands to a target protein.",
-      "input": "Target PDB file and ligand file.",
-      "output": "Binding affinity score and docked pose.",
-      "tools": [ "AutoDock Vina", "Smina" ]
-    },
-    {
-      "name": "PropertyPredictor",
-      "purpose": "Predicts drug-likeness and ADMET properties (e.g., BBB permeability).",
-      "input": "Molecule in SMILES format.",
-      "output": "Drug-likeness properties (e.g., logP, TPSA) and ADMET profile.",
-      "tools": [ "SwissADME", "ADMETlab", "Custom ML models" ]
-    },
-    {
-      "name": "ToxicityPredictor",
-      "purpose": "Predicts the toxicity profile and adverse drug reactions of molecules.",
-      "input": "Molecule in SMILES format.",
-      "output": "Toxicology statistics and predictions.",
-      "tools": [ "ProTox-II API", "Custom ML models" ]
-    },
-    {
-      "name": "Simulator",
-      "purpose": "Runs molecular dynamics simulations to analyze molecule behavior and stability.",
-      "input": "Docked protein-ligand complex.",
-      "output": "Molecular stability metrics and trajectories.",
-      "tools": [ "OpenMM", "GROMACS" ]
-    },
-    {
-      "name": "Analyzer",
-      "purpose": "Ranks and evaluates candidate molecules using aggregated data and a scoring function.",
-      "input": "Results from docking, property prediction, and toxicity modules.",
-      "output": "A ranked list of candidate molecules.",
-      "tools": [ "LLMs", "Custom scoring heuristics", "ML classifiers" ]
-    }
-  ],
-  "aiAgents": [
-    {
-      "name": "SciencePlanner",
-      "file": "science_planner.py",
-      "role": "Builds a custom pipeline from a high-level user goal.",
-      "codeExample": "def plan_pipeline(goal):\n    targets = TargetSelector.find_targets(goal)\n    ligands = LigandFinder.fetch_similar(targets)\n    return build_workflow(targets, ligands)"
-    },
-    {
-      "name": "Evaluator",
-      "file": "evaluator.py",
-      "role": "Scores molecules based on docking, ADMET, and simulation results.",
-      "codeExample": "class Evaluator:\n    def score(mol):\n        docking_score = DockingEngine.dock(mol)\n        properties = PropertyPredictor.predict(mol)\n        tox = ToxicityPredictor.assess(mol)\n        return weighted_score(docking_score, properties, tox)"
-    },
-    {
-      "name": "DataMiner",
-      "file": "data_miner.py",
-      "role": "Executes data retrieval tasks, such as fetching ligands and targets."
-    },
-    {
-      "name": "MoleculeEditor",
-      "file": "molecule_editor.py",
-      "role": "Generates and suggests modifications to molecules."
-    },
-    {
-      "name": "Orchestrator",
-      "file": "orchestrator.py",
-      "role": "Manages the execution flow of the entire pipeline and coordinates other agents."
-    }
-  ],
-  "deployment": {
-    "localDevelopment": {
-      "requirements": "Python 3.10+, Node.js 18+, Conda.",
-      "backendSetup": "cd backend && conda env create -f environment.yml && conda activate neurolab && uvicorn main:app --reload",
-      "frontendSetup": "cd ../frontend && npm install && npm run dev"
-    },
-    "dockerized": {
-      "description": "Docker Compose is used for streamlined, production-ready deployment of all services.",
-      "commands": {
-        "build": "docker-compose build",
-        "start": "docker-compose up -d",
-        "stop": "docker-compose down"
-      },
-      "defaultPorts": {
-        "frontend": "http://localhost:3000",
-        "backend_api_docs": "http://localhost:8000/docs"
-      }
-    },
-    "cloudAndGPU": {
-      "description": "The platform can be deployed on any server with Docker, with specific support for GPU acceleration.",
-      "providers": [
-        "Local/On-Prem GPU Server",
-        "Vast.ai",
-        "Google Cloud",
-        "AWS",
-        "Azure"
-      ],
-      "gpuCommand": "docker compose -f docker-compose.gpu.yml up --build",
-      "notes": "Requires NVIDIA drivers and the nvidia-docker runtime. A reverse proxy like NGINX with SSL is recommended for public-facing deployments."
-    }
-  },
-  "exampleUsage": {
-    "scenario": "Neuroenhancer Discovery",
-    "goal": "Identify a Blood-Brain Barrier (BBB) permeable MAO-B inhibitor to enhance dopamine availability.",
-    "workflowSteps": [
-      {
-        "step": 1,
-        "action": "Select Target",
-        "details": "Choose MAO-B, using PDB ID 2V5Z as the target structure."
-      },
-      {
-        "step": 2,
-        "action": "Ligand Retrieval",
-        "details": "Fetch known inhibitors like Selegiline, Rasagiline, and Hordenine from PubChem."
-      },
-      {
-        "step": 3,
-        "action": "Docking",
-        "details": "Run AutoDock Vina to estimate the binding affinity of each ligand to MAO-B."
-      },
-      {
-        "step": 4,
-        "action": "Property Prediction",
-        "details": "Use SwissADME to predict BBB permeability, logP, and TPSA for each ligand."
-      },
-      {
-        "step": 5,
-        "action": "Toxicity Screening",
-        "details": "Assess toxicity using the ProTox-II web server or a local model."
-      },
-      {
-        "step": 6,
-        "action": "Molecule Optimization",
-        "details": "Use the MoleculeEditor agent with Chai-1 to generate novel analogs of the top-performing ligands."
-      },
-      {
-        "step": 7,
-        "action": "Simulation",
-        "details": "Run a short GROMACS or OpenMM molecular dynamics simulation on the most promising complexes to check for stability."
-      },
-      {
-        "step": 8,
-        "action": "Ranking and Analysis",
-        "details": "The Evaluator agent scores and ranks all candidates. Results are visualized in the GUI and can be exported as a report."
-      }
-    ]
-  },
-  "developmentRoadmap": [
-    "Build backend API scaffolding with FastAPI.",
-    "Implement the first two modules: TargetSelector and LigandFinder.",
-    "Create initial UI tabs: Dashboard, Molecules, Pipelines, Results.",
-    "Test the first end-to-end pipeline using a sample receptor and ligand.",
-    "Add robust caching and scoring models.",
-    "Invite contributors to the project."
-  ]
+  "platformInfo": {
+    "name": "NeuroLab",
+    "description": "A general-purpose, AI-powered drug discovery platform. It is designed to be a modular, intelligent, and automated system for end-to-end research workflows, from target selection and molecule generation to docking, simulation, and property prediction.",
+    "vision": "To build a powerful, modular, and partially-commercial open-source platform for AI-driven drug discovery, enabling complete automated workflows, custom agents, and end-to-end pipelines for any disease, condition, or compound family.",
+    "keyFeatures": [
+      "End-to-End Automation: Fully integrated drug discovery pipelines accessible via API or GUI.",
+      "Intelligent Agents: AI-driven agents to plan, generate, evaluate, and optimize molecular candidates.",
+      "Modular Architecture: Plug-and-play components with CLI, GUI, and API access.",
+      "Multi-Target Capable: Supports various biological targets like enzymes, receptors, and transporters (e.g., MAO-B, DAT, NMDA).",
+      "Customizable Workflows: Build and define workflows visually or via YAML/JSON configuration files.",
+      "Cross-Platform Compute: Capable of running on local machines, dedicated GPU clusters, or cloud services (GCP, AWS, Vast.ai)."
+    ],
+    "license": {
+      "type": "Business Source License (BSL-1.1)",
+      "terms": "non-converting"
+    },
+    "maintainer": {
+      "name": "Abderrahim Safou",
+      "email": "safou348@gmail.com"
+    }
+  },
+  "projectGoals": [
+    "Enable drug discovery from scratch.",
+    "Facilitate drug repurposing.",
+    "Optimize candidate properties (e.g., BBB permeability, low-toxicity).",
+    "Utilize AI agents to iterate faster than manual workflows.",
+    "Foster a synergy between open-source and commercial development."
+  ],
+  "technicalStack": {
+    "backend": {
+      "language": "Python",
+      "framework": "FastAPI"
+    },
+    "frontend": {
+      "language": "JavaScript/TypeScript",
+      "framework": "React",
+      "buildTool": "Vite",
+      "styling": "TailwindCSS",
+      "uiLibraries": [
+        "ShadCN",
+        "Recharts"
+      ],
+      "visualization": "NGL viewer"
+    },
+    "databaseAndCache": {
+      "metadata": "PostgreSQL, MongoDB",
+      "taskQueueAndCache": "Redis",
+      "storage": "Local filesystem or cloud object storage for large files (PDBs, docking results)."
+    },
+    "devOps": {
+      "containerization": "Docker, Docker Compose",
+      "versionControl": "Git, GitHub",
+      "os": "Linux/macOS recommended (Ubuntu or Fedora)"
+    },
+    "scientificAndML": {
+      "core": "RDKit, OpenMM, GROMACS",
+      "docking": "AutoDock Vina, Smina",
+      "predictionAPIs": "SwissADME, ADMETlab, ProTox-II",
+      "generativeChemistry": "MolDesigner, Chai-1",
+      "analysisAndFrameworks": "HuggingFace Transformers, LLMs for scoring"
+    }
+  },
+  "architecture": {
+    "style": "Monorepo",
+    "projectStructure": {
+      "root": "neurolab/",
+      "directories": [
+        {
+          "name": "backend/",
+          "description": "FastAPI application for serving the API.",
+          "children": [
+            {
+              "name": "api/",
+              "description": "API endpoints definition."
+            },
+            {
+              "name": "core/",
+              "description": "Agent orchestrator, workflow logic, and core business logic."
+            },
+            {
+              "name": "modules/",
+              "description": "Individual scientific modules (e.g., target_selector.py, docking_engine.py)."
+            }
+          ]
+        },
+        {
+          "name": "frontend/",
+          "description": "React and TailwindCSS for the user interface.",
+          "children": [
+            {
+              "name": "dashboard/",
+              "description": "Main dashboard component."
+            },
+            {
+              "name": "molecule_viewer/",
+              "description": "Component for 3D molecular visualization."
+            },
+            {
+              "name": "logs/",
+              "description": "Component for displaying logs."
+            }
+          ]
+        },
+        {
+          "name": "agents/",
+          "description": "Implementations of autonomous AI agents (e.g., science_planner.py)."
+        },
+        {
+          "name": "orchestrator/",
+          "description": "Task queue management using Celery for asynchronous jobs."
+        },
+        {
+          "name": "workflows/",
+          "description": "Pre-defined and custom workflow configurations (e.g., default_pipeline.json)."
+        },
+        {
+          "name": "data/",
+          "description": "Cache for molecules, results, PDBs, and other scientific data."
+        },
+        {
+          "name": "docker/",
+          "description": "Dockerfiles and Docker Compose files for building services."
+        },
+        {
+          "name": "scripts/",
+          "description": "Utility and maintenance scripts."
+        },
+        {
+          "name": "docs/",
+          "description": "Platform documentation, architecture diagrams, and specifications."
+        }
+      ],
+      "keyFiles": [
+        "README.md: Overview of the platform.",
+        "LICENSE.md: Legal terms for use and protection.",
+        "COMMERCIAL.md: Usage rules for commercial products.",
+        "CONTRIBUTING.md: How to contribute code, plugins, and data.",
+        "workflows/default_pipeline.json: Defines the steps for the default end-to-end pipeline.",
+        "agents/: Directory containing the core logic that drives workflows and decisions.",
+        "modules/: Directory containing the scientific backends that power the agents."
+      ]
+    }
+  },
+  "workflowPhilosophy": {
+    "description": "NeuroLab is not a rigid pipeline, but a flexible system where agents and modules collaborate to achieve a defined scientific outcome. Each module is API-exposed and communicates via an orchestrator layer.",
+    "useCases": [
+      {
+        "case": "Full Agent Orchestration",
+        "description": "Input a target disease or protein name and let the 'SciencePlanner' agent define the best strategy and execute the full workflow."
+      },
+      {
+        "case": "Isolated Module Execution",
+        "description": "Run modules independently, such as using the 'DockingEngine' with pre-supplied molecules or the 'PropertyPredictor' for a single compound."
+      },
+      {
+        "case": "Simulation-Only",
+        "description": "Use the 'Simulator' module to test the pharmacokinetics of an already optimized candidate."
+      },
+      {
+        "case": "Multi-Agent Experiments",
+        "description": "Chain agents like 'DataMiner', 'MoleculeEditor', and 'Evaluator' to autonomously propose, create, and validate molecular iterations."
+      }
+    ],
+    "configuration": "Workflows are configurable via JSON files in the `/workflows` directory and can be executed through the orchestrator API."
+  },
+  "coreModules": [
+    {
+      "name": "TargetSelector",
+      "purpose": "Fetches and identifies relevant biological targets based on a given disease.",
+      "input": "Disease or condition name.",
+      "output": "A list of relevant targets (e.g., protein PDB IDs).",
+      "tools": [ "RCSB API", "UniProt API", "AlphaFold DB" ]
+    },
+    {
+      "name": "LigandFinder",
+      "purpose": "Searches for and retrieves ligand molecules from chemical databases.",
+      "input": "Keyword or target name.",
+      "output": "A list of ligands in formats like SMILES.",
+      "tools": [ "PubChem (via pubchempy)", "ChEMBL API" ]
+    },
+    {
+      "name": "MolecularEditor",
+      "purpose": "Generates or modifies molecules to create new variants.",
+      "input": "A molecule in SMILES format.",
+      "output": "A modified or newly generated molecule.",
+      "tools": [ "RDKit", "MolDesigner", "Chai-1" ]
+    },
+    {
+      "name": "DockingEngine",
+      "purpose": "Performs molecular docking of ligands to a target protein.",
+      "input": "Target PDB file and ligand file.",
+      "output": "Binding affinity score and docked pose.",
+      "tools": [ "AutoDock Vina", "Smina" ]
+    },
+    {
+      "name": "PropertyPredictor",
+      "purpose": "Predicts drug-likeness and ADMET properties (e.g., BBB permeability).",
+      "input": "Molecule in SMILES format.",
+      "output": "Drug-likeness properties (e.g., logP, TPSA) and ADMET profile.",
+      "tools": [ "SwissADME", "ADMETlab", "Custom ML models" ]
+    },
+    {
+      "name": "ToxicityPredictor",
+      "purpose": "Predicts the toxicity profile and adverse drug reactions of molecules.",
+      "input": "Molecule in SMILES format.",
+      "output": "Toxicology statistics and predictions.",
+      "tools": [ "ProTox-II API", "Custom ML models" ]
+    },
+    {
+      "name": "Simulator",
+      "purpose": "Runs molecular dynamics simulations to analyze molecule behavior and stability.",
+      "input": "Docked protein-ligand complex.",
+      "output": "Molecular stability metrics and trajectories.",
+      "tools": [ "OpenMM", "GROMACS" ]
+    },
+    {
+      "name": "Analyzer",
+      "purpose": "Ranks and evaluates candidate molecules using aggregated data and a scoring function.",
+      "input": "Results from docking, property prediction, and toxicity modules.",
+      "output": "A ranked list of candidate molecules.",
+      "tools": [ "LLMs", "Custom scoring heuristics", "ML classifiers" ]
+    }
+  ],
+  "aiAgents": [
+    {
+      "name": "SciencePlanner",
+      "file": "science_planner.py",
+      "role": "Builds a custom pipeline from a high-level user goal.",
+      "codeExample": "def plan_pipeline(goal):\n    targets = TargetSelector.find_targets(goal)\n    ligands = LigandFinder.fetch_similar(targets)\n    return build_workflow(targets, ligands)"
+    },
+    {
+      "name": "Evaluator",
+      "file": "evaluator.py",
+      "role": "Scores molecules based on docking, ADMET, and simulation results.",
+      "codeExample": "class Evaluator:\n    def score(mol):\n        docking_score = DockingEngine.dock(mol)\n        properties = PropertyPredictor.predict(mol)\n        tox = ToxicityPredictor.assess(mol)\n        return weighted_score(docking_score, properties, tox)"
+    },
+    {
+      "name": "DataMiner",
+      "file": "data_miner.py",
+      "role": "Executes data retrieval tasks, such as fetching ligands and targets."
+    },
+    {
+      "name": "MoleculeEditor",
+      "file": "molecule_editor.py",
+      "role": "Generates and suggests modifications to molecules."
+    },
+    {
+      "name": "Orchestrator",
+      "file": "orchestrator.py",
+      "role": "Manages the execution flow of the entire pipeline and coordinates other agents."
+    }
+  ],
+  "deployment": {
+    "localDevelopment": {
+      "requirements": "Python 3.10+, Node.js 18+, Conda.",
+      "backendSetup": "cd backend && conda env create -f environment.yml && conda activate neurolab && uvicorn main:app --reload",
+      "frontendSetup": "cd ../frontend && npm install && npm run dev"
+    },
+    "dockerized": {
+      "description": "Docker Compose is used for streamlined, production-ready deployment of all services.",
+      "commands": {
+        "build": "docker-compose build",
+        "start": "docker-compose up -d",
+        "stop": "docker-compose down"
+      },
+      "defaultPorts": {
+        "frontend": "http://localhost:3000",
+        "backend_api_docs": "http://localhost:8000/docs"
+      }
+    },
+    "cloudAndGPU": {
+      "description": "The platform can be deployed on any server with Docker, with specific support for GPU acceleration.",
+      "providers": [
+        "Local/On-Prem GPU Server",
+        "Vast.ai",
+        "Google Cloud",
+        "AWS",
+        "Azure"
+      ],
+      "gpuCommand": "docker compose -f docker-compose.gpu.yml up --build",
+      "notes": "Requires NVIDIA drivers and the nvidia-docker runtime. A reverse proxy like NGINX with SSL is recommended for public-facing deployments."
+    }
+  },
+  "exampleUsage": {
+    "scenario": "Neuroenhancer Discovery",
+    "goal": "Identify a Blood-Brain Barrier (BBB) permeable MAO-B inhibitor to enhance dopamine availability.",
+    "workflowSteps": [
+      {
+        "step": 1,
+        "action": "Select Target",
+        "details": "Choose MAO-B, using PDB ID 2V5Z as the target structure."
+      },
+      {
+        "step": 2,
+        "action": "Ligand Retrieval",
+        "details": "Fetch known inhibitors like Selegiline, Rasagiline, and Hordenine from PubChem."
+      },
+      {
+        "step": 3,
+        "action": "Docking",
+        "details": "Run AutoDock Vina to estimate the binding affinity of each ligand to MAO-B."
+      },
+      {
+        "step": 4,
+        "action": "Property Prediction",
+        "details": "Use SwissADME to predict BBB permeability, logP, and TPSA for each ligand."
+      },
+      {
+        "step": 5,
+        "action": "Toxicity Screening",
+        "details": "Assess toxicity using the ProTox-II web server or a local model."
+      },
+      {
+        "step": 6,
+        "action": "Molecule Optimization",
+        "details": "Use the MoleculeEditor agent with Chai-1 to generate novel analogs of the top-performing ligands."
+      },
+      {
+        "step": 7,
+        "action": "Simulation",
+        "details": "Run a short GROMACS or OpenMM molecular dynamics simulation on the most promising complexes to check for stability."
+      },
+      {
+        "step": 8,
+        "action": "Ranking and Analysis",
+        "details": "The Evaluator agent scores and ranks all candidates. Results are visualized in the GUI and can be exported as a report."
+      }
+    ]
+  },
+  "developmentRoadmap": [
+    "Build backend API scaffolding with FastAPI.",
+    "Implement the first two modules: TargetSelector and LigandFinder.",
+    "Create initial UI tabs: Dashboard, Molecules, Pipelines, Results.",
+    "Test the first end-to-end pipeline using a sample receptor and ligand.",
+    "Add robust caching and scoring models.",
+    "Invite contributors to the project."
+  ],
+  "nextSteps": {
+    "mvpPlan": [
+      "Implement a “lite” workflow: target selection → ligand fetch → docking → ADMET prediction → ranking.",
+      "Integrate a CLI + web GUI with progress tracking."
+    ],
+    "devMilestones": [
+      "Backend API endpoints for each module.",
+      "GUI step-by-step pipeline builder.",
+      "Redis + Celery orchestration + logging.",
+      "GPU-enabled Docker setup."
+    ],
+    "communityAndGrowth": [
+      "Public GitHub repo with issues + discussions.",
+      "Tutorials + example workflows (e.g., “Find a COVID-19 inhibitor”).",
+      "Partnership with university bioinformatics labs."
+    ],
+    "futureModules": [
+      "QSAR model trainer.",
+      "CRISPR-based gene targeting.",
+      "Target mutation simulation."
+    ],
+    "businessStrategy": {
+      "openSourceCore": "Keep core modules open-source.",
+      "commercialTier": [
+        "Cloud auto-scaling",
+        "Private agents",
+        "Proprietary data integrations (e.g., paid chemical libraries)"
+      ]
+    }
+  }
 }
