@@ -20,6 +20,13 @@
       "email": "safou348@gmail.com"
     }
   },
+  "projectGoals": [
+    "Enable drug discovery from scratch.",
+    "Facilitate drug repurposing.",
+    "Optimize candidate properties (e.g., BBB permeability, low-toxicity).",
+    "Utilize AI agents to iterate faster than manual workflows.",
+    "Foster a synergy between open-source and commercial development."
+  ],
   "technicalStack": {
     "backend": {
       "language": "Python",
@@ -37,7 +44,7 @@
       "visualization": "NGL viewer"
     },
     "databaseAndCache": {
-      "metadata": "PostgreSQL or MongoDB",
+      "metadata": "PostgreSQL, MongoDB",
       "taskQueueAndCache": "Redis",
       "storage": "Local filesystem or cloud object storage for large files (PDBs, docking results)."
     },
@@ -49,9 +56,9 @@
     "scientificAndML": {
       "core": "RDKit, OpenMM, GROMACS",
       "docking": "AutoDock Vina, Smina",
-      "predictionAPIs": "SwissADME, ProTox-II",
-      "mlFrameworks": "HuggingFace Transformers",
-      "generativeChemistry": "Chai-1, MolDesigner"
+      "predictionAPIs": "SwissADME, ADMETlab, ProTox-II",
+      "generativeChemistry": "MolDesigner, Chai-1",
+      "analysisAndFrameworks": "HuggingFace Transformers, LLMs for scoring"
     }
   },
   "architecture": {
@@ -73,21 +80,31 @@
             },
             {
               "name": "modules/",
-              "description": "Individual scientific modules (e.g., docking_engine, property_predictor)."
-            },
-            {
-              "name": "data/cache/",
-              "description": "Local cache for PDBs, ligands, and prediction results."
+              "description": "Individual scientific modules (e.g., target_selector.py, docking_engine.py)."
             }
           ]
         },
         {
           "name": "frontend/",
-          "description": "React and TailwindCSS for the user interface."
+          "description": "React and TailwindCSS for the user interface.",
+          "children": [
+            {
+              "name": "dashboard/",
+              "description": "Main dashboard component."
+            },
+            {
+              "name": "molecule_viewer/",
+              "description": "Component for 3D molecular visualization."
+            },
+            {
+              "name": "logs/",
+              "description": "Component for displaying logs."
+            }
+          ]
         },
         {
           "name": "agents/",
-          "description": "Implementations of autonomous AI agents (e.g., SciencePlanner, Evaluator)."
+          "description": "Implementations of autonomous AI agents (e.g., science_planner.py)."
         },
         {
           "name": "orchestrator/",
@@ -98,132 +115,147 @@
           "description": "Pre-defined and custom workflow configurations (e.g., default_pipeline.json)."
         },
         {
-          "name": "docker/",
-          "description": "Dockerfiles for building containerized services."
+          "name": "data/",
+          "description": "Cache for molecules, results, PDBs, and other scientific data."
         },
         {
-          "name": "docs/",
-          "description": "Platform documentation, architecture diagrams, and specifications."
+          "name": "docker/",
+          "description": "Dockerfiles and Docker Compose files for building services."
         },
         {
           "name": "scripts/",
           "description": "Utility and maintenance scripts."
+        },
+        {
+          "name": "docs/",
+          "description": "Platform documentation, architecture diagrams, and specifications."
         }
+      ],
+      "keyFiles": [
+        "README.md: Overview of the platform.",
+        "LICENSE.md: Legal terms for use and protection.",
+        "COMMERCIAL.md: Usage rules for commercial products.",
+        "CONTRIBUTING.md: How to contribute code, plugins, and data.",
+        "workflows/default_pipeline.json: Defines the steps for the default end-to-end pipeline.",
+        "agents/: Directory containing the core logic that drives workflows and decisions.",
+        "modules/: Directory containing the scientific backends that power the agents."
       ]
     }
+  },
+  "workflowPhilosophy": {
+    "description": "NeuroLab is not a rigid pipeline, but a flexible system where agents and modules collaborate to achieve a defined scientific outcome. Each module is API-exposed and communicates via an orchestrator layer.",
+    "useCases": [
+      {
+        "case": "Full Agent Orchestration",
+        "description": "Input a target disease or protein name and let the 'SciencePlanner' agent define the best strategy and execute the full workflow."
+      },
+      {
+        "case": "Isolated Module Execution",
+        "description": "Run modules independently, such as using the 'DockingEngine' with pre-supplied molecules or the 'PropertyPredictor' for a single compound."
+      },
+      {
+        "case": "Simulation-Only",
+        "description": "Use the 'Simulator' module to test the pharmacokinetics of an already optimized candidate."
+      },
+      {
+        "case": "Multi-Agent Experiments",
+        "description": "Chain agents like 'DataMiner', 'MoleculeEditor', and 'Evaluator' to autonomously propose, create, and validate molecular iterations."
+      }
+    ],
+    "configuration": "Workflows are configurable via JSON files in the `/workflows` directory and can be executed through the orchestrator API."
   },
   "coreModules": [
     {
       "name": "TargetSelector",
-      "purpose": "Identifies and fetches relevant biological targets based on a given disease or condition.",
+      "purpose": "Fetches and identifies relevant biological targets based on a given disease.",
       "input": "Disease or condition name.",
       "output": "A list of relevant targets (e.g., protein PDB IDs).",
-      "tools": [
-        "RCSB API",
-        "UniProt API",
-        "AlphaFold DB"
-      ]
+      "tools": [ "RCSB API", "UniProt API", "AlphaFold DB" ]
     },
     {
       "name": "LigandFinder",
       "purpose": "Searches for and retrieves ligand molecules from chemical databases.",
       "input": "Keyword or target name.",
       "output": "A list of ligands in formats like SMILES.",
-      "tools": [
-        "PubChem (via pubchempy)",
-        "ChEMBL API"
-      ]
+      "tools": [ "PubChem (via pubchempy)", "ChEMBL API" ]
     },
     {
       "name": "MolecularEditor",
-      "purpose": "Modifies or generates new molecules (ligands) based on existing structures.",
+      "purpose": "Generates or modifies molecules to create new variants.",
       "input": "A molecule in SMILES format.",
       "output": "A modified or newly generated molecule.",
-      "tools": [
-        "RDKit",
-        "Chai-1",
-        "MolDesigner"
-      ]
+      "tools": [ "RDKit", "MolDesigner", "Chai-1" ]
     },
     {
       "name": "DockingEngine",
-      "purpose": "Performs molecular docking to predict the binding affinity and pose of a ligand to a target.",
+      "purpose": "Performs molecular docking of ligands to a target protein.",
       "input": "Target PDB file and ligand file.",
       "output": "Binding affinity score and docked pose.",
-      "tools": [
-        "AutoDock Vina",
-        "Smina"
-      ]
+      "tools": [ "AutoDock Vina", "Smina" ]
     },
     {
       "name": "PropertyPredictor",
-      "purpose": "Predicts physicochemical and pharmacokinetic properties (ADMET).",
+      "purpose": "Predicts drug-likeness and ADMET properties (e.g., BBB permeability).",
       "input": "Molecule in SMILES format.",
-      "output": "Drug-likeness properties (e.g., BBB permeability, logP, TPSA).",
-      "tools": [
-        "SwissADME",
-        "ADMETlab",
-        "Custom ML models"
-      ]
+      "output": "Drug-likeness properties (e.g., logP, TPSA) and ADMET profile.",
+      "tools": [ "SwissADME", "ADMETlab", "Custom ML models" ]
     },
     {
       "name": "ToxicityPredictor",
-      "purpose": "Assesses the potential toxicity of a molecule.",
+      "purpose": "Predicts the toxicity profile and adverse drug reactions of molecules.",
       "input": "Molecule in SMILES format.",
-      "output": "Toxicology statistics.",
-      "tools": [
-        "ProTox-II API",
-        "Local toxicity ML models"
-      ]
+      "output": "Toxicology statistics and predictions.",
+      "tools": [ "ProTox-II API", "Custom ML models" ]
     },
     {
       "name": "Simulator",
-      "purpose": "Runs molecular dynamics simulations to assess the stability of a protein-ligand complex.",
+      "purpose": "Runs molecular dynamics simulations to analyze molecule behavior and stability.",
       "input": "Docked protein-ligand complex.",
-      "output": "Molecular stability metrics.",
-      "tools": [
-        "GROMACS",
-        "OpenMM"
-      ]
+      "output": "Molecular stability metrics and trajectories.",
+      "tools": [ "OpenMM", "GROMACS" ]
     },
     {
       "name": "Analyzer",
-      "purpose": "Aggregates all results and ranks candidate molecules based on a scoring function.",
+      "purpose": "Ranks and evaluates candidate molecules using aggregated data and a scoring function.",
       "input": "Results from docking, property prediction, and toxicity modules.",
       "output": "A ranked list of candidate molecules.",
-      "tools": [
-        "Custom scoring heuristics",
-        "ML classifiers"
-      ]
+      "tools": [ "LLMs", "Custom scoring heuristics", "ML classifiers" ]
     }
   ],
   "aiAgents": [
     {
       "name": "SciencePlanner",
-      "role": "Builds a custom pipeline of tasks based on a high-level user goal (e.g., 'find an anti-anxiety drug')."
+      "file": "science_planner.py",
+      "role": "Builds a custom pipeline from a high-level user goal.",
+      "codeExample": "def plan_pipeline(goal):\n    targets = TargetSelector.find_targets(goal)\n    ligands = LigandFinder.fetch_similar(targets)\n    return build_workflow(targets, ligands)"
     },
     {
-      "name": "DataMinerAgent",
-      "role": "Executes tasks to fetch data, such as finding targets or ligands from external databases."
+      "name": "Evaluator",
+      "file": "evaluator.py",
+      "role": "Scores molecules based on docking, ADMET, and simulation results.",
+      "codeExample": "class Evaluator:\n    def score(mol):\n        docking_score = DockingEngine.dock(mol)\n        properties = PropertyPredictor.predict(mol)\n        tox = ToxicityPredictor.assess(mol)\n        return weighted_score(docking_score, properties, tox)"
     },
     {
-      "name": "MolEditorAgent",
-      "role": "Generates variants of a given molecule (SMILES) to explore the chemical space."
+      "name": "DataMiner",
+      "file": "data_miner.py",
+      "role": "Executes data retrieval tasks, such as fetching ligands and targets."
     },
     {
-      "name": "EvaluatorAgent",
-      "role": "Scores candidates based on an aggregation of docking results, ADMET properties, and toxicity predictions."
+      "name": "MoleculeEditor",
+      "file": "molecule_editor.py",
+      "role": "Generates and suggests modifications to molecules."
     },
     {
-      "name": "OrchestratorAgent",
-      "role": "Controls the overall execution of the pipeline, managing the flow of data between other agents and modules."
+      "name": "Orchestrator",
+      "file": "orchestrator.py",
+      "role": "Manages the execution flow of the entire pipeline and coordinates other agents."
     }
   ],
   "deployment": {
     "localDevelopment": {
       "requirements": "Python 3.10+, Node.js 18+, Conda.",
       "backendSetup": "cd backend && conda env create -f environment.yml && conda activate neurolab && uvicorn main:app --reload",
-      "frontendSetup": "cd frontend && npm install && npm run dev"
+      "frontendSetup": "cd ../frontend && npm install && npm run dev"
     },
     "dockerized": {
       "description": "Docker Compose is used for streamlined, production-ready deployment of all services.",
@@ -282,7 +314,7 @@
       {
         "step": 6,
         "action": "Molecule Optimization",
-        "details": "Use the MolEditorAgent with Chai-1 to generate novel analogs of the top-performing ligands."
+        "details": "Use the MoleculeEditor agent with Chai-1 to generate novel analogs of the top-performing ligands."
       },
       {
         "step": 7,
@@ -292,8 +324,16 @@
       {
         "step": 8,
         "action": "Ranking and Analysis",
-        "details": "The EvaluatorAgent scores and ranks all candidates. Results are visualized in the GUI and can be exported as a report."
+        "details": "The Evaluator agent scores and ranks all candidates. Results are visualized in the GUI and can be exported as a report."
       }
     ]
-  }
+  },
+  "developmentRoadmap": [
+    "Build backend API scaffolding with FastAPI.",
+    "Implement the first two modules: TargetSelector and LigandFinder.",
+    "Create initial UI tabs: Dashboard, Molecules, Pipelines, Results.",
+    "Test the first end-to-end pipeline using a sample receptor and ligand.",
+    "Add robust caching and scoring models.",
+    "Invite contributors to the project."
+  ]
 }
