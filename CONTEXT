@@ -13,7 +13,7 @@
     ],
     "license": {
       "type": "Business Source License (BSL-1.1)",
-      "terms": "Converts to AGPL after 3 years."
+      "terms": "non-converting"
     },
     "maintainer": {
       "name": "Abderrahim Safou",
