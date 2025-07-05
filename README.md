@@ -172,7 +172,7 @@ We welcome contributions, bug reports, new agent ideas, and feature requests. Op
 
 ## 📜 License
 
-MIT License. See [LICENSE](LICENSE).
+BSL1.1(non-converting) License. See [LICENSE](LICENSE).
 
 ---
 
