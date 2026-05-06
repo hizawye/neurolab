@@ -1,24 +1,33 @@
 [project]
-name = "backend"
+name = "neurolab-backend"
 version = "0.1.0"
-description = ""
+description = "FastAPI backend for NeuroLab's runnable scientific workflow MVP."
 authors = [
     {name = "Abderrahim Safou",email = "safou348@gmail.com"}
 ]
-readme = "README.md"
+readme = "../README.md"
 requires-python = ">=3.10,<4.0"
 dependencies = [
-    "fastapi (>=0.115.14,<0.116.0)",
-    "uvicorn (>=0.35.0,<0.36.0)",
-    "sqlalchemy (>=2.0.41,<3.0.0)",
-    "celery (>=5.5.3,<6.0.0)",
-    "langchain (>=0.3.26,<0.4.0)",
-    "rdkit (>=2025.3.3,<2026.0.0)",
-    "python-dotenv (>=1.1.1,<2.0.0)",
-    "psycopg2-binary (>=2.9.10,<3.0.0)",
-    "requests (>=2.32.4,<3.0.0)",
-    "cachetools (>=6.1.0,<7.0.0)"
+    "fastapi>=0.115.14,<0.116.0",
+    "uvicorn>=0.35.0,<0.36.0",
+    "rdkit>=2025.3.3,<2026.0.0",
+    "python-dotenv>=1.1.1,<2.0.0",
+    "requests>=2.32.4,<3.0.0",
+    "cachetools>=6.1.0,<7.0.0",
 ]
+
+[dependency-groups]
+dev = [
+    "httpx>=0.27.0,<1.0.0",
+    "pytest>=8.0.0,<9.0.0",
+]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+pythonpath = [".."]
+
+[tool.uv]
+package = false
 
 
 [build-system]
