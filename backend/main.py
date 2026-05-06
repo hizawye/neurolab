@@ -1,27 +1,34 @@
-from fastapi import FastAPI
-from .api import targets, science_planner
+import os
 
-app = FastAPI()
+from fastapi import FastAPI
+from fastapi.middleware.cors import CORSMiddleware
+
+from .api import ligands, targets, workflows
+
+app = FastAPI(title="NeuroLab API", version="0.1.0")
 
 app.include_router(targets.router)
-app.include_router(science_planner.router)
+app.include_router(ligands.router)
+app.include_router(workflows.router)
 
-@app.post("/workflow/run")
-async def run_workflow():
-    return {"message": "Workflow running"}
+cors_origins = [
+    origin.strip()
+    for origin in os.getenv(
+        "BACKEND_CORS_ORIGINS",
+        "http://localhost:5173,http://localhost:3000",
+    ).split(",")
+    if origin.strip()
+]
 
-@app.get("/ligand/find")
-async def find_ligand():
-    return {"message": "Ligand found"}
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=cors_origins,
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 
-@app.post("/dock/run")
-async def run_docking():
-    return {"message": "Docking running"}
 
-@app.post("/simulate/run")
-async def run_simulation():
-    return {"message": "Simulation running"}
-
-@app.post("/predict/admet")
-async def predict_admet():
-    return {"message": "ADMET predicted"}
+@app.get("/health")
+async def health():
+    return {"status": "ok"}
