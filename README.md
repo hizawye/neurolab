@@ -1,189 +1,119 @@
-# 🧠 NeuroLab: AI-Powered Drug Discovery Platform
+# NeuroLab
 
-NeuroLab is a modular, intelligent, and fully automated platform for drug discovery and neuroenhancement research. It supports end-to-end workflows—from target selection and molecule generation to docking, simulation, and property prediction—by unifying open-source tools, public datasets, and scalable compute infrastructure.
+NeuroLab is a source-available drug discovery workbench. The current MVP focuses on one runnable local workflow:
 
----
-
-## 🚀 Key Features
-
-* **End-to-End Automation**: Fully integrated drug discovery pipelines with just a few clicks or API calls.
-* **Intelligent Agents**: AI-driven agents plan, generate, evaluate, and optimize candidates.
-* **Modular Architecture**: Plug-and-play components with CLI, GUI, and API access.
-* **Multi-Target Capable**: Supports enzymes, receptors, and transporters (e.g. MAO-B, DAT, NMDA).
-* **Customizable Workflows**: Build workflows visually or via YAML.
-* **Cross-Platform Compute**: Run on local machines, GPU clusters, or cloud (GCP, Vast.ai, etc.).
-
----
-
-## 📦 Project Structure
-
-```
-neurolab/
-├— agents/               # Autonomous AI agents
-├— backend/              # FastAPI backend
-├— frontend/             # React UI
-├— modules/              # Core engine modules (docking, prediction, etc.)
-├— workflows/            # Built-in and user-defined pipelines
-├— data/                 # Cache for molecules, results, metadata
-├— configs/              # Model and environment configurations
-├— scripts/              # Utility scripts and CLI tools
-├— docker/               # Docker build files
-├— docs/                 # Documentation and architecture
-└— README.md
+```text
+target search -> ligand lookup -> RDKit descriptors -> transparent ranking
 ```
 
----
+The broader roadmap includes docking, ADMET integrations, workflow orchestration, and simulation, but those are not production features yet.
 
-## ⚙️ Installation (Developer Mode)
+## Current Capabilities
+
+- FastAPI backend with typed endpoints for health, target search, ligand search, and lite workflow execution.
+- RCSB Search API integration for target candidates.
+- PubChem lookup for ligand candidates, with a small query expansion for common neuroscience targets.
+- RDKit descriptor calculation for molecular weight, LogP, TPSA, hydrogen bond donors, and hydrogen bond acceptors.
+- Deterministic ranking score for early BBB-oriented screening.
+- React/Vite frontend with a runnable workflow dashboard.
+
+## Requirements
+
+- Node.js 18+
+- npm 9+
+- uv
+- Python 3.10+
+
+Install uv if it is not already available:
 
 ```bash
-git clone https://github.com/your-org/neurolab
-cd neurolab
+curl -LsSf https://astral.sh/uv/install.sh | sh
+```
 
-# Backend setup
-cd backend
-conda env create -f environment.yml
-conda activate neurolab
-uvicorn main:app --reload
+## Development
 
-# Frontend setup
-cd ../frontend
+Install frontend dependencies:
+
+```bash
 npm install
+```
+
+Install backend dependencies and run tests:
+
+```bash
+cd backend
+uv sync --group dev
+uv run pytest
+```
+
+Run the backend:
+
+```bash
+cd backend
+uv run uvicorn backend.main:app --reload --app-dir ..
+```
+
+Run the frontend in another shell:
+
+```bash
 npm run dev
 ```
 
-> 💡 Requirements: Python 3.10+, Node.js 18+, Conda. GPU recommended for AI modules and docking.
+Open:
 
----
+- Frontend: http://localhost:5173
+- API docs: http://localhost:8000/docs
 
-## 🐳 Docker Setup (Production-Ready)
+## API
 
-NeuroLab comes with Docker support for streamlined deployment:
+### `GET /health`
 
-### 1. **Build the containers**
+Returns backend health.
 
-```bash
-docker-compose build
+### `GET /targets/search?query=MAO-B&limit=10`
+
+Returns RCSB target candidates.
+
+### `GET /ligands/search?query=selegiline&limit=8`
+
+Returns PubChem ligand candidates.
+
+### `POST /workflows/run-lite`
+
+Runs the MVP workflow.
+
+```json
+{
+  "query": "MAO-B inhibitor",
+  "limit": 8
+}
 ```
 
-### 2. **Start all services**
+Response includes targets, ranked ligands, descriptors, score notes, and non-fatal warnings.
+
+## Verification
 
 ```bash
-docker-compose up -d
+npm run build
+npm run lint
+npm test
 ```
 
-This will launch:
+## Docker
 
-* 🚀 `FastAPI backend` on port `8000`
-* 🌐 `React frontend` on port `3000`
-* 🧠 `Celery workers` for background tasks
-* 🔋 `Redis` and `PostgreSQL` for data caching and storage
+`docker/docker-compose.yml` currently provides local PostgreSQL and pgAdmin only. The MVP backend does not persist results yet. Full backend/frontend/worker Docker deployment is planned after storage and orchestration are added.
 
-### 3. **Access**
+## Roadmap
 
-* Frontend: [http://localhost:3000](http://localhost:3000)
-* API Docs: [http://localhost:8000/docs](http://localhost:8000/docs)
+Next phases:
 
-### 4. **Stop**
+1. Persist workflow runs and results in PostgreSQL.
+2. Add Redis/Celery for background job execution and progress logs.
+3. Add ChEMBL ligand search as a second source.
+4. Add docking with Vina/Smina and artifact storage.
+5. Add ADMET/toxicity integrations.
+6. Add molecule visualization and editing once real result artifacts exist.
 
-```bash
-docker-compose down
-```
+## License
 
-> 📁 You can customize `.env`, ports, or volumes in `docker-compose.yml`.
-
----
-
-## 🛠️ Deployment Guide
-
-### ▶️ Option 1: Deploy on Local/On-Prem GPU Server
-
-1. Install Docker + Docker Compose
-2. Set up NVIDIA GPU drivers + `nvidia-docker` runtime
-3. Update `docker-compose.gpu.yml` (use GPU-accelerated containers)
-4. Launch:
-
-```bash
-docker compose -f docker-compose.gpu.yml up --build
-```
-
----
-
-### ☑️ Option 2: Deploy on Cloud
-
-#### **Vast.ai (GPU on demand)**
-
-1. Launch an instance with Docker + GPU
-2. Clone your repo:
-
-```bash
-git clone https://github.com/your-org/neurolab.git
-cd neurolab
-```
-
-3. Run Docker deployment
-4. Access via public IP and mapped ports
-
-#### **Google Cloud / AWS / Azure**
-
-* Use GPU-enabled VM (e.g., T4, A100)
-* Install Docker and follow same deployment as above
-* Use reverse proxy (NGINX or Caddy) + SSL (Let's Encrypt)
-
----
-
-## 🔁 Sample Workflow: Neuroenhancer Discovery
-
-> *Goal*: Identify BBB-permeable MAO-B inhibitors for enhanced dopamine availability.
-
-1. **Select Target**: MAO-B (e.g., PDB: `2V5Z`)
-2. **Ligand Retrieval**: Use PubChem to fetch Selegiline, Rasagiline, Hordenine
-3. **Docking**: AutoDock Vina for binding affinity estimation
-4. **Property Prediction**: Use SwissADME for BBB, logP, TPSA
-5. **Toxicity Screening**: Run through ProTox-II
-6. **Molecule Optimization**: Generate analogs with Chai-1
-7. **Simulation**: Run GROMACS or OpenMM dynamics on top ligands
-8. **AI Scoring**: Evaluate candidates via `Evaluator` agent
-9. **Export**: Save as SDF, visualize in GUI, or export report
-
-All steps can be executed via GUI, CLI, or API.
-
----
-
-## 📱 API Access
-
-FastAPI endpoints support:
-
-* Pipeline execution
-* Protein/ligand upload
-* Docking job control
-* ADMET querying
-* Molecule generation
-
-See full Swagger at `/docs`.
-
----
-
-## 🤝 Contributing
-
-We welcome contributions, bug reports, new agent ideas, and feature requests. Open issues or pull requests to collaborate.
-
----
-
-## 📜 License
-
-BSL1.1(non-converting) License. See [LICENSE](LICENSE).
-
----
-
-## 🙏 Acknowledgements
-
-NeuroLab is built on top of powerful open-source libraries and datasets:
-
-* [RDKit](https://www.rdkit.org/)
-* [AutoDock Vina](http://vina.scripps.edu/)
-* [SwissADME](http://www.swissadme.ch/)
-* [ChEMBL](https://www.ebi.ac.uk/chembl/)
-* [OpenMM](https://openmm.org/)
-* [HuggingFace Transformers](https://huggingface.co/)
-* [Chai (Molecule LLM)](https://chai-research.com/)
+Business Source License 1.1, non-converting. Commercial use requires a separate license from the licensor. See [LICENSE](LICENSE).
