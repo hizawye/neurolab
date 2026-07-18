@@ -32,6 +32,47 @@ read-out; it is deliberately **not** the ranking signal, because molecular weigh
 TPSA describe drug-likeness and carry no information about whether a compound binds a given
 target.
 
+## Validation harness
+
+`backend/science/` measures whether a scoring method actually predicts binding, rather
+than assuming it does. Nothing in it runs in a request path, and its dependencies
+(scikit-learn, scipy, pandas) live in the `dev` group rather than the runtime set — the
+API server never imports them. It needs `uv sync --group dev`.
+
+```bash
+cd backend
+uv run python -m backend.science.cli --panel          # full CNS panel
+uv run python -m backend.science.cli --target CHEMBL2039
+NEUROLAB_OFFLINE=1 uv run python -m backend.science.cli --panel   # reproduce from cache
+```
+
+Reports land in `reports/` as markdown plus machine-readable JSON, stamped with the ChEMBL
+release and the seed.
+
+**The pre-registered criterion**, fixed before the first run: a method is validated only if
+it beats *all three* baselines — random, the existing descriptor score, and nearest-neighbour
+Tanimoto similarity — on BEDROC, with its bootstrap lower bound above the best baseline.
+
+`max_tanimoto` is the bar that matters. Many published QSAR models never beat plain
+similarity search, and reporting a win over random alone is the most common way this kind of
+work misleads. If a model loses to similarity, that is the finding and it is reported as one.
+
+Design decisions that make the numbers mean something:
+
+- **Scaffold split** (Bemis-Murcko, DeepChem convention: large scaffold groups fill train,
+  test gets rare and singleton scaffolds). ChEMBL actives arrive as congeneric series, so a
+  random split puts near-identical analogs on both sides and inflates every metric. The
+  random split is still reported beside it — the gap measures the analog bias.
+- **Two dataset tracks, never pooled.** Track A inactives are *measured*. Track B pads with
+  property-matched decoys that are *presumed* inactive, needed because enrichment metrics are
+  meaningless at Track A's class ratio.
+- **The 5-7 pChEMBL band is discarded.** Between-lab measurement error is comparable to that
+  window's width, so those labels would be noise.
+- **Median across repeat measurements**, not max, so ranking follows consensus rather than
+  the most flattering outlier.
+- **BEDROC's random reference is not 0.5.** It depends on the active ratio (~0.12 at 10%
+  actives, ~0.05 at 0.5%). Each report states its own reference.
+
 ### Known limitations
 
 - The descriptor score is weakly discriminative and not yet validated against known
