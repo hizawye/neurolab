@@ -3,7 +3,8 @@
 NeuroLab is a source-available drug discovery workbench. The current MVP focuses on one runnable local workflow:
 
 ```text
-target search -> ligand lookup -> RDKit descriptors -> transparent ranking
+target resolution -> measured binders (ChEMBL) -> RDKit descriptors -> affinity ranking
+                  \-> PDB structures (RCSB)
 ```
 
 The broader roadmap includes docking, ADMET integrations, workflow orchestration, and simulation, but those are not production features yet.
@@ -11,11 +12,36 @@ The broader roadmap includes docking, ADMET integrations, workflow orchestration
 ## Current Capabilities
 
 - FastAPI backend with typed endpoints for health, target search, ligand search, and lite workflow execution.
-- RCSB Search API integration for target candidates.
-- PubChem lookup for ligand candidates, with a small query expansion for common neuroscience targets.
+- ChEMBL target resolution: free text (e.g. `dopamine D2 receptor`) resolves to a single
+  ChEMBL target, preferring human single-protein entries, with its UniProt accession.
+- ChEMBL bioactivity lookup: ligands are compounds with *measured* binding affinity against
+  that resolved target, so the target genuinely selects the ligand set.
+- Binding assays only (`Ki`, `Kd`, `IC50`); functional readouts like `EC50` are excluded so a
+  single ranking never mixes occupancy with downstream response.
+- Repeat measurements of the same compound collapse to their **median** pChEMBL, so ranking
+  follows consensus rather than the most favourable outlier.
+- RCSB Search API for PDB structures of the same target, as structural context.
 - RDKit descriptor calculation for molecular weight, LogP, TPSA, hydrogen bond donors, and hydrogen bond acceptors.
-- Deterministic ranking score for early BBB-oriented screening.
 - React/Vite frontend with a runnable workflow dashboard.
+
+## How ranking works
+
+Ligands are ordered by **measured affinity** (pChEMBL, i.e. -log10 molar potency — higher is
+stronger). The descriptor score is reported alongside as a BBB-oriented *developability*
+read-out; it is deliberately **not** the ranking signal, because molecular weight, LogP and
+TPSA describe drug-likeness and carry no information about whether a compound binds a given
+target.
+
+### Known limitations
+
+- The descriptor score is weakly discriminative and not yet validated against known
+  actives/inactives. Treat it as a flag, not a verdict.
+- ChEMBL target search is fuzzy and can match on a stray word. The resolved target is shown
+  in the UI so it can be verified, and low-relevance matches raise a warning — but the
+  warning is a heuristic threshold, not a correctness guarantee. **Always check the resolved
+  target before trusting a result set.**
+- Ligands are drawn from the most-potent slice of ChEMBL for the target, so the set is biased
+  toward the high-affinity tail rather than being a representative sample of known chemistry.
 
 ## Requirements
 
@@ -72,11 +98,12 @@ Returns backend health.
 
 ### `GET /targets/search?query=MAO-B&limit=10`
 
-Returns RCSB target candidates.
+Returns RCSB PDB structure candidates.
 
-### `GET /ligands/search?query=selegiline&limit=8`
+### `GET /ligands/search?query=dopamine D2 receptor&limit=8`
 
-Returns PubChem ligand candidates.
+Resolves the query to a ChEMBL target and returns its known binders, most potent first,
+with descriptors and measured affinity. Responds 404 if no target matches.
 
 ### `POST /workflows/run-lite`
 
@@ -84,12 +111,13 @@ Runs the MVP workflow.
 
 ```json
 {
-  "query": "MAO-B inhibitor",
+  "query": "dopamine D2 receptor",
   "limit": 8
 }
 ```
 
-Response includes targets, ranked ligands, descriptors, score notes, and non-fatal warnings.
+Response includes the resolved ChEMBL target, RCSB structures, ligands ranked by measured
+affinity with their pChEMBL evidence, descriptors, score notes, and non-fatal warnings.
 
 ## Verification
 
@@ -109,10 +137,9 @@ Next phases:
 
 1. Persist workflow runs and results in PostgreSQL.
 2. Add Redis/Celery for background job execution and progress logs.
-3. Add ChEMBL ligand search as a second source.
-4. Add docking with Vina/Smina and artifact storage.
-5. Add ADMET/toxicity integrations.
-6. Add molecule visualization and editing once real result artifacts exist.
+3. Add docking with Vina/Smina and artifact storage.
+4. Add ADMET/toxicity integrations.
+5. Add molecule visualization and editing once real result artifacts exist.
 
 ## License
 

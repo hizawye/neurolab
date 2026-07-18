@@ -7,12 +7,29 @@ class TargetResult(BaseModel):
     source_url: str
 
 
-class LigandResult(BaseModel):
-    cid: int
-    name: str
-    smiles: str
-    molecular_formula: str | None = None
+class ResolvedTarget(BaseModel):
+    chembl_id: str
+    pref_name: str
+    organism: str | None = None
+    target_type: str | None = None
+    uniprot_accession: str | None = None
+    match_score: float | None = None
     source_url: str
+
+
+class LigandResult(BaseModel):
+    chembl_id: str
+    name: str | None = None
+    smiles: str
+    source_url: str
+
+
+class ActivityEvidence(BaseModel):
+    """Measured potency against the resolved target, aggregated per molecule."""
+
+    pchembl_value: float
+    standard_type: str
+    measurement_count: int
 
 
 class DescriptorSet(BaseModel):
@@ -26,6 +43,7 @@ class DescriptorSet(BaseModel):
 class RankedLigand(BaseModel):
     ligand: LigandResult
     descriptors: DescriptorSet
+    activity: ActivityEvidence | None = None
     score: float
     notes: list[str] = Field(default_factory=list)
 
@@ -44,6 +62,7 @@ class LiteWorkflowRequest(BaseModel):
 class LiteWorkflowResponse(BaseModel):
     query: str
     ligand_query: str
+    resolved_target: ResolvedTarget | None = None
     targets: list[TargetResult]
     ligands: list[RankedLigand]
     warnings: list[WorkflowWarning] = Field(default_factory=list)

@@ -1,91 +1,77 @@
-from cachetools import cached, TTLCache
-import requests
+from collections import Counter
+from statistics import median
 
-from ..schemas import LigandResult
-from .errors import ExternalServiceError
+from . import chembl_client
+from ..schemas import ActivityEvidence, LigandResult, ResolvedTarget
 
-cache = TTLCache(maxsize=200, ttl=3600)
+# Binding affinities only. EC50 and other functional readouts measure a
+# different quantity, so pooling them into one ranking would compare
+# occupancy against downstream response.
+BINDING_ASSAY_TYPES = ("Ki", "Kd", "IC50")
+
+# Activity rows pulled per requested ligand. A molecule usually carries
+# several measurements, so the window has to exceed the ligand count for
+# per-molecule aggregation to have anything to aggregate.
+RECORDS_PER_LIGAND = 20
+MAX_RECORDS = 400
 
 
 class LigandFinder:
-    def __init__(self):
-        self.base_url = "https://pubchem.ncbi.nlm.nih.gov/rest/pug"
-        self.timeout_seconds = 12
+    """Ligands with measured activity against a specific ChEMBL target."""
 
-    def find_ligands(self, query: str, limit: int = 8) -> list[LigandResult]:
-        names = self._candidate_names(query)[:limit]
-        ligands: list[LigandResult] = []
+    def find_for_target(
+        self,
+        target: ResolvedTarget,
+        limit: int = 8,
+    ) -> list[tuple[LigandResult, ActivityEvidence]]:
+        window = min(limit * RECORDS_PER_LIGAND, MAX_RECORDS)
+        activities = chembl_client.activities_for_target(
+            target.chembl_id,
+            BINDING_ASSAY_TYPES,
+            window,
+        )
 
-        for name in names:
-            try:
-                ligands.extend(self._fetch_by_name(name, remaining=limit - len(ligands)))
-            except ExternalServiceError:
-                if name == query:
-                    raise
-
-            if len(ligands) >= limit:
-                break
-
-        return ligands[:limit]
-
-    def _candidate_names(self, query: str) -> list[str]:
-        normalized = query.strip().lower()
-        candidates = [query.strip()]
-
-        if "mao-b" in normalized or "maob" in normalized:
-            candidates.extend(["selegiline", "rasagiline", "safinamide"])
-        if "dopamine" in normalized:
-            candidates.extend(["selegiline", "rasagiline", "bupropion"])
-        if "nmda" in normalized:
-            candidates.extend(["memantine", "ketamine", "dextromethorphan"])
-
-        seen: set[str] = set()
-        unique: list[str] = []
-        for candidate in candidates:
-            key = candidate.lower()
-            if candidate and key not in seen:
-                unique.append(candidate)
-                seen.add(key)
-        return unique
-
-    @cached(cache)
-    def _fetch_by_name(self, name: str, remaining: int) -> tuple[LigandResult, ...]:
-        try:
-            cids_response = requests.get(
-                f"{self.base_url}/compound/name/{name}/cids/JSON",
-                timeout=self.timeout_seconds,
-            )
-            if cids_response.status_code == 404:
-                return ()
-            cids_response.raise_for_status()
-            cids = cids_response.json().get("IdentifierList", {}).get("CID", [])[:remaining]
-            if not cids:
-                return ()
-
-            properties = "CanonicalSMILES,ConnectivitySMILES,MolecularFormula,IUPACName"
-            props_response = requests.get(
-                f"{self.base_url}/compound/cid/{','.join(str(cid) for cid in cids)}/property/{properties}/JSON",
-                timeout=self.timeout_seconds,
-            )
-            props_response.raise_for_status()
-        except requests.RequestException as exc:
-            raise ExternalServiceError("PubChem", str(exc)) from exc
-
-        results = []
-        for item in props_response.json().get("PropertyTable", {}).get("Properties", []):
-            cid = item.get("CID")
-            smiles = item.get("CanonicalSMILES") or item.get("ConnectivitySMILES")
-            if not cid or not smiles:
+        grouped: dict[str, list[dict]] = {}
+        for activity in activities:
+            molecule_id = activity.get("molecule_chembl_id")
+            smiles = activity.get("canonical_smiles")
+            pchembl = activity.get("pchembl_value")
+            if not molecule_id or not smiles or pchembl is None:
                 continue
+            grouped.setdefault(molecule_id, []).append(activity)
 
-            results.append(
-                LigandResult(
-                    cid=cid,
-                    name=item.get("IUPACName") or name,
-                    smiles=smiles,
-                    molecular_formula=item.get("MolecularFormula"),
-                    source_url=f"https://pubchem.ncbi.nlm.nih.gov/compound/{cid}",
-                )
-            )
+        candidates = [
+            self._aggregate(molecule_id, records)
+            for molecule_id, records in grouped.items()
+        ]
+        candidates.sort(key=lambda pair: pair[1].pchembl_value, reverse=True)
+        return candidates[:limit]
 
-        return tuple(results)
+    def _aggregate(
+        self,
+        molecule_id: str,
+        records: list[dict],
+    ) -> tuple[LigandResult, ActivityEvidence]:
+        """Collapse repeat measurements of one molecule into a single value.
+
+        Median rather than max: the same compound is often assayed many times
+        across labs, and taking the best number would rank on the most
+        favourable outlier instead of the consensus.
+        """
+        values = [float(record["pchembl_value"]) for record in records]
+        assay_types = Counter(record.get("standard_type") or "unknown" for record in records)
+
+        # Research compounds often have no registered name; fall back to the
+        # accession so every row stays identifiable in the UI.
+        ligand = LigandResult(
+            chembl_id=molecule_id,
+            name=records[0].get("molecule_pref_name") or molecule_id,
+            smiles=records[0]["canonical_smiles"],
+            source_url=f"https://www.ebi.ac.uk/chembl/compound_report_card/{molecule_id}/",
+        )
+        evidence = ActivityEvidence(
+            pchembl_value=round(median(values), 2),
+            standard_type=assay_types.most_common(1)[0][0],
+            measurement_count=len(values),
+        )
+        return ligand, evidence
