@@ -220,6 +220,37 @@ where similarity search won and the ML did not ship. The principle is identical 
 — the evidence decides — and the difference is the margin: 0.13 with disjoint intervals here
 against ~0.03 with a contrary early-enrichment result there.
 
+## The actives are more homogeneous than the benchmark implies
+
+A caveat that qualifies every activity number above, found while sizing the docking
+comparison. Test compounds were binned by their maximum ECFP4 Tanimoto to the *training*
+actives — that is, by how novel they are relative to what a similarity search gets to see:
+
+| bin | MAO-B compounds | MAO-B actives | D2 compounds | D2 actives |
+|---|---|---|---|---|
+| novel (<0.3) | 1496 | **14** | 1419 | **3** |
+| related (0.3–0.5) | 401 | 39 | 435 | 11 |
+| close analog (≥0.5) | 98 | 92 | 146 | 136 |
+
+Almost every active is a close analog of something in the training set, *despite* a
+Bemis-Murcko scaffold split having already separated them by scaffold. A different scaffold
+is not the same as different chemistry: these are congeneric series with decorated cores, and
+the fingerprint still sees the shared chemotype.
+
+Two consequences:
+
+1. **Similarity search's headline numbers describe the easy case.** It is being asked to
+   recognise chemistry that resembles chemistry it was shown, which is close to the only case
+   this data contains. The 0.874–0.962 BEDROC is real but should not be read as a claim about
+   genuinely novel scaffolds.
+2. **The interesting comparison is barely measurable.** Testing whether a structure-based
+   method helps on unfamiliar chemistry needs unfamiliar actives, and for these targets
+   ChEMBL holds almost none — 3 for D2. That is a limit of the available data, not of the
+   method being tested, and it is why the docking comparison below runs on MAO-B alone.
+
+This is the same publication-bias pattern seen in Track A, in a different guise: the
+literature explores around what already works.
+
 ## Docking: validated on 2 of 3 targets
 
 Docking was added only after the ligand-based methods were benchmarked, so it has something

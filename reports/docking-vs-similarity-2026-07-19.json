@@ -1,0 +1,61 @@
+{
+  "metadata": {
+    "chembl_release": "ChEMBL_37",
+    "seed": 20260718,
+    "generated_at": "2026-07-19T02:20:55.003536+00:00"
+  },
+  "targets": [
+    {
+      "target": "CHEMBL2039",
+      "name": "MAO-B",
+      "eligible": true,
+      "pdb": "2V5Z",
+      "ligand": "SAG",
+      "redock_rmsd": 1.3965079231946587,
+      "n_compounds": 20,
+      "n_active": 8,
+      "active_ratio": 0.4,
+      "n_train_actives": 872,
+      "n_docking_failures": 0,
+      "elapsed_minutes": 2.4,
+      "overall": {
+        "docking": {
+          "roc_auc": 0.8437499999999999,
+          "pr_auc": 0.7675595238095239,
+          "ef_1pct": 2.5,
+          "ef_5pct": 2.5,
+          "bedroc": 0.7668783227491799,
+          "bedroc_ci": [
+            0.13206294099339486,
+            0.9999999999999999
+          ]
+        },
+        "similarity": {
+          "roc_auc": 0.9895833333333333,
+          "pr_auc": 0.9861111111111112,
+          "ef_1pct": 2.5,
+          "ef_5pct": 2.5,
+          "bedroc": 0.9996355089742874,
+          "bedroc_ci": [
+            0.9889547642239833,
+            1.0
+          ]
+        }
+      },
+      "by_novelty": [
+        {
+          "bin": "dissimilar (<0.5)",
+          "n": 13,
+          "n_active": 1,
+          "note": "underpowered: 1 actives, need 30"
+        },
+        {
+          "bin": "close analog (>=0.5)",
+          "n": 7,
+          "n_active": 7,
+          "note": "underpowered: 7 actives, need 30"
+        }
+      ]
+    }
+  ]
+}
