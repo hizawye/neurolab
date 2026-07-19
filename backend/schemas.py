@@ -67,7 +67,10 @@ class ScreenedCompound(BaseModel):
     descriptors: DescriptorSet | None = None
     predicted: PredictedActivity | None = None
     measured: ActivityEvidence | None = None
-    developability_score: float | None = None
+    # P(BBB+) from the validated model. Replaces the hand-tuned descriptor
+    # score, which lost to TPSA alone when finally tested against measured
+    # brain-penetration data.
+    bbb_probability: float | None = None
     notes: list[str] = Field(default_factory=list)
 
 

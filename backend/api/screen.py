@@ -15,7 +15,7 @@ from ..modules import predictor, target_resolver
 from ..modules.descriptors import calculate_descriptors
 from ..modules.errors import ExternalServiceError
 from ..modules.ligand_finder import LigandFinder
-from ..modules.ranker import score_descriptors
+from ..modules import bbb_model
 from ..schemas import (
     PredictedActivity,
     ScreenedCompound,
@@ -83,8 +83,24 @@ async def screen_compounds(request: ScreenRequest):
         if canonical is not None
     }
 
+    # Batched: the model scores the whole request in one forward pass rather
+    # than one per compound.
+    if bbb_model.available():
+        bbb_scores = bbb_model.predict_batch(request.smiles)
+    else:
+        bbb_scores = [None] * len(request.smiles)
+        warnings.append(
+            WorkflowWarning(
+                stage="bbb",
+                message=(
+                    "BBB model artifact missing; penetration not predicted. "
+                    "Run: uv run python -m backend.science.train_bbb"
+                ),
+            )
+        )
+
     results: list[ScreenedCompound] = []
-    for smiles in request.smiles:
+    for index, smiles in enumerate(request.smiles):
         descriptors = calculate_descriptors(smiles)
         if descriptors is None:
             warnings.append(
@@ -94,7 +110,6 @@ async def screen_compounds(request: ScreenRequest):
             continue
 
         prediction = predictor.predict_against(smiles, references)
-        developability, notes = score_descriptors(descriptors)
 
         results.append(
             ScreenedCompound(
@@ -105,8 +120,7 @@ async def screen_compounds(request: ScreenRequest):
                 # data; surfacing that stops a measured value being presented
                 # as a prediction.
                 measured=measured_by_smiles.get(_canonical(smiles)),
-                developability_score=developability,
-                notes=notes,
+                bbb_probability=bbb_scores[index],
             )
         )
 
@@ -130,6 +144,9 @@ async def screen_compounds(request: ScreenRequest):
                 f"top {len(references)} known binders. A blank measurement means "
                 f"'not in that set', not 'untested'."
             ),
+            # BBB is a separate prediction with its own track record; keeping the
+            # records apart stops one method's validation vouching for another.
+            "bbb": bbb_model.validation_record() if bbb_model.available() else None,
         },
         results=results,
         warnings=warnings,

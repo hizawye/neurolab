@@ -1,0 +1,28 @@
+{
+  "chembl_release": "ChEMBL_37",
+  "seed": 20260718,
+  "generated_at": "2026-07-19T01:44:17.199531+00:00",
+  "dataset": "B3DB classification",
+  "source": "https://raw.githubusercontent.com/theochem/B3DB/main/B3DB/B3DB_classification.tsv",
+  "n_total": 7807,
+  "n_train": 6246,
+  "n_test": 1561,
+  "test_positive_rate": 0.5701473414477899,
+  "split": "Bemis-Murcko scaffold",
+  "featurisation": {
+    "type": "ECFP4",
+    "radius": 2,
+    "bits": 2048
+  },
+  "n_estimators": 100,
+  "roc_auc": 0.9286592206835347,
+  "roc_auc_ci": [
+    0.9161656374508159,
+    0.9392696260344484
+  ],
+  "pr_auc": 0.9472125151178884,
+  "baselines": {
+    "tpsa_only": 0.822508749309265,
+    "hand_tuned_descriptor_score": 0.7994792277164721
+  }
+}

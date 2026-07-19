@@ -27,10 +27,14 @@ The broader roadmap includes docking, ADMET integrations, workflow orchestration
 ## How ranking works
 
 Ligands are ordered by **measured affinity** (pChEMBL, i.e. -log10 molar potency — higher is
-stronger). The descriptor score is reported alongside as a BBB-oriented *developability*
-read-out; it is deliberately **not** the ranking signal, because molecular weight, LogP and
-TPSA describe drug-likeness and carry no information about whether a compound binds a given
-target.
+stronger). Descriptors are reported alongside as raw values, which they are; they are
+deliberately **not** the ranking signal, because molecular weight, LogP and TPSA describe
+drug-likeness and carry no information about whether a compound binds a given target.
+
+Screening adds two *predictions*, each with its own independently measured track record and
+each kept in its own field so that one method's validation never vouches for another's:
+similarity to known actives (activity) and a trained model (BBB penetration). Measured values
+are never merged into a predicted field.
 
 ## Validation harness
 
@@ -73,10 +77,26 @@ Design decisions that make the numbers mean something:
 - **BEDROC's random reference is not 0.5.** It depends on the active ratio (~0.12 at 10%
   actives, ~0.05 at 0.5%). Each report states its own reference.
 
+## BBB prediction
+
+The developability score was benchmarked against B3DB (7,807 compounds with measured
+brain-penetration outcomes) and **lost to TPSA alone** — ROC-AUC 0.799 against 0.823, with a
+paired-bootstrap difference of [-0.037, -0.009], entirely below zero. Its molecular weight,
+LogP and hydrogen-bond terms were actively harmful rather than merely redundant.
+
+It was replaced by a random forest over ECFP4 (ROC-AUC 0.929, CI [0.916, 0.939]), trained by:
+
+```bash
+cd backend
+uv run python -m backend.science.train_bbb
+```
+
+The artifact ships with a sidecar JSON recording its held-out numbers and the baselines it
+beat; the API refuses to load a model without that record, so a prediction can always be
+traced to the evaluation justifying it.
+
 ### Known limitations
 
-- The descriptor score is weakly discriminative and not yet validated against known
-  actives/inactives. Treat it as a flag, not a verdict.
 - ChEMBL target search is fuzzy and can match on a stray word. The resolved target is shown
   in the UI so it can be verified, and low-relevance matches raise a warning — but the
   warning is a heuristic threshold, not a correctness guarantee. **Always check the resolved

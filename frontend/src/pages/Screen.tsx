@@ -17,7 +17,7 @@ type ScreenedCompound = {
   } | null;
   predicted: PredictedActivity | null;
   measured: { pchembl_value: number; standard_type: string; measurement_count: number } | null;
-  developability_score: number | null;
+  bbb_probability: number | null;
   notes: string[];
 };
 
@@ -34,6 +34,14 @@ type ScreenResponse = {
     best_for: string;
     weak_for: string;
     measured_coverage: string;
+    bbb: {
+      method: string;
+      dataset: string;
+      roc_auc: number;
+      roc_auc_ci: number[];
+      beats: Record<string, number>;
+      caveat: string;
+    } | null;
   };
   results: ScreenedCompound[];
   warnings: { stage: string; message: string }[];
@@ -196,6 +204,22 @@ export default function Screen() {
             </div>
             <p className="mt-2 text-xs text-slate-600">{result.method.caveat}</p>
             <p className="mt-1 text-xs text-slate-600">{result.method.measured_coverage}</p>
+            {result.method.bbb ? (
+              <div className="mt-3 border-t border-teal-200 pt-3">
+                <p className="text-sm text-slate-800">
+                  <span className="font-semibold">BBB column: </span>
+                  {result.method.bbb.method}. Held-out ROC-AUC{' '}
+                  <span className="font-mono">{result.method.bbb.roc_auc.toFixed(3)}</span>{' '}
+                  <span className="font-mono text-xs">
+                    [{result.method.bbb.roc_auc_ci[0].toFixed(3)}, {result.method.bbb.roc_auc_ci[1].toFixed(3)}]
+                  </span>{' '}
+                  on {result.method.bbb.dataset}, beating TPSA alone (
+                  {result.method.bbb.beats.tpsa_only?.toFixed(3)}) and the previous hand-tuned
+                  score ({result.method.bbb.beats.hand_tuned_descriptor_score?.toFixed(3)}).
+                </p>
+                <p className="mt-1 text-xs text-slate-600">{result.method.bbb.caveat}</p>
+              </div>
+            ) : null}
           </section>
 
           <section className="rounded-lg border border-slate-200 bg-white shadow-sm">
@@ -206,7 +230,7 @@ export default function Screen() {
                     <th className="px-4 py-3">Compound</th>
                     <th className="px-4 py-3">Predicted</th>
                     <th className="px-4 py-3">Measured</th>
-                    <th className="px-4 py-3">Developability</th>
+                    <th className="px-4 py-3">BBB</th>
                     <th className="px-4 py-3">Notes</th>
                   </tr>
                 </thead>
@@ -254,7 +278,18 @@ export default function Screen() {
                           )}
                         </td>
                         <td className="px-4 py-3 text-slate-700">
-                          {row.developability_score ?? <span className="text-slate-400">&mdash;</span>}
+                          {row.bbb_probability !== null ? (
+                            <>
+                              <span className="font-semibold text-slate-950">
+                                {row.bbb_probability.toFixed(2)}
+                              </span>
+                              <span className="ml-2 text-xs text-slate-500">
+                                {row.bbb_probability >= 0.5 ? 'likely crosses' : 'likely excluded'}
+                              </span>
+                            </>
+                          ) : (
+                            <span className="text-slate-400">&mdash;</span>
+                          )}
                         </td>
                         <td className="px-4 py-3 text-xs text-slate-600">
                           {row.notes.join('; ') || '—'}

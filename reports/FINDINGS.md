@@ -192,6 +192,34 @@ actives) because MAO-B inhibitor papers do publish negative results.
 This is publication bias made visible: the better-studied the target, the less usable its
 measured-inactive set is for benchmarking.
 
+## The BBB score: tested, and it failed
+
+The developability score was displayed to users as a BBB-oriented read-out and had never been
+tested against measured brain penetration. Benchmarked against B3DB (7,807 compounds with
+experimental BBB outcomes, same scaffold-split protocol):
+
+| method | ROC-AUC | 95% CI |
+|---|---|---|
+| random forest on ECFP4 | **0.929** | [0.916, 0.939] |
+| TPSA alone | 0.823 | [0.804, 0.842] |
+| **hand-tuned descriptor score** | **0.799** | [0.780, 0.820] |
+| LogP alone | 0.618 | [0.589, 0.644] |
+| random | 0.457 | [0.429, 0.485] |
+
+The hand-tuned score is better than random, so it was not pure noise. But it is **worse than
+a single descriptor**. A paired bootstrap on the difference against TPSA gives
+[-0.037, -0.009] — entirely below zero, so the gap is real and not sampling noise.
+
+Its molecular weight, LogP, and hydrogen-bond terms were not merely redundant with TPSA; on
+this data they were actively harmful. Four extra terms and a hand-chosen weighting produced a
+worse predictor than the one descriptor they were built around.
+
+The score was replaced with the random forest, which beats it by 0.13 ROC-AUC with
+non-overlapping intervals. Note this sends the opposite way to the activity result above,
+where similarity search won and the ML did not ship. The principle is identical in both cases
+— the evidence decides — and the difference is the margin: 0.13 with disjoint intervals here
+against ~0.03 with a contrary early-enrichment result there.
+
 ## What shipped, and why
 
 **Similarity search**, exposed at `POST /screen`.
@@ -227,9 +255,9 @@ Stated plainly, because the result is easy to oversell:
   other target classes is untested.
 - **Nothing here addresses selectivity, toxicity, ADMET, or synthesizability.** The output is
   a prioritisation signal, not a drug candidate.
-- **BBB descriptor rules remain unvalidated.** The developability score is still reported but
-  has not been tested against measured brain penetration, and should be read as a flag rather
-  than a verdict.
+- **BBB prediction is a class, not a concentration.** The model predicts BBB+/BBB− and says
+  nothing about brain concentration, efflux liability, metabolism, or free fraction in tissue.
+  Its training labels are curated from literature with varying assay conditions.
 - **No experimental validation.** Nothing in this report is wet-lab evidence.
 
 ## Reproducing

@@ -1,19 +1,14 @@
 import { BrowserRouter, NavLink, Route, Routes } from 'react-router-dom';
 import Home from './pages/Home';
 import Screen from './pages/Screen';
-import WorkflowBuilder from './pages/WorkflowBuilder';
-import DockingVisualizer from './pages/DockingVisualizer';
-import MoleculeEditor from './pages/MoleculeEditor';
-import ResultsDashboard from './pages/ResultsDashboard';
 import './App.css';
 
+// Only routes backed by working functionality. Docking, molecule editing and
+// persisted results are on the roadmap and are listed in the README rather
+// than shown here as tabs that render a "planned" card.
 const navItems = [
   { to: '/', label: 'Workflow' },
   { to: '/screen', label: 'Screen' },
-  { to: '/workflow', label: 'Builder' },
-  { to: '/docking', label: 'Docking' },
-  { to: '/editor', label: 'Molecules' },
-  { to: '/results', label: 'Results' },
 ];
 
 function App() {
@@ -51,10 +46,6 @@ function App() {
         <Routes>
           <Route path="/" element={<Home />} />
           <Route path="/screen" element={<Screen />} />
-        <Route path="/workflow" element={<WorkflowBuilder />} />
-          <Route path="/docking" element={<DockingVisualizer />} />
-          <Route path="/editor" element={<MoleculeEditor />} />
-          <Route path="/results" element={<ResultsDashboard />} />
         </Routes>
       </main>
     </BrowserRouter>
