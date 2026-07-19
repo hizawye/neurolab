@@ -1,0 +1,1612 @@
+{
+  "metadata": {
+    "chembl_release": "ChEMBL_37",
+    "seed": 20260718,
+    "generated_at": "2026-07-19T01:30:57.125879+00:00",
+    "targets": [
+      "CHEMBL217",
+      "CHEMBL2039",
+      "CHEMBL214"
+    ]
+  },
+  "datasets": [
+    {
+      "track": "A_measured",
+      "n_active": 3446,
+      "n_inactive": 500,
+      "chembl_release": "ChEMBL_37",
+      "seed": 20260718,
+      "generated_at": "2026-07-19T01:06:25.275853+00:00",
+      "target": "CHEMBL217",
+      "active_threshold": 7.0,
+      "inactive_threshold": 5.0,
+      "discarded_ambiguous": 5353,
+      "raw_records": 13178
+    },
+    {
+      "track": "B_decoys",
+      "n_active": 502,
+      "n_inactive": 90175,
+      "chembl_release": "ChEMBL_37",
+      "seed": 20260718,
+      "generated_at": "2026-07-19T01:07:30.632491+00:00",
+      "requested_decoys": 99898,
+      "matched_decoys": 90175,
+      "max_tanimoto": 0.35,
+      "active_fraction": 0.005,
+      "target": "CHEMBL217"
+    },
+    {
+      "track": "A_measured",
+      "n_active": 1017,
+      "n_inactive": 1278,
+      "chembl_release": "ChEMBL_37",
+      "seed": 20260718,
+      "generated_at": "2026-07-19T01:14:58.997773+00:00",
+      "target": "CHEMBL2039",
+      "active_threshold": 7.0,
+      "inactive_threshold": 5.0,
+      "discarded_ambiguous": 2635,
+      "raw_records": 6477
+    },
+    {
+      "track": "B_decoys",
+      "n_active": 502,
+      "n_inactive": 85084,
+      "chembl_release": "ChEMBL_37",
+      "seed": 20260718,
+      "generated_at": "2026-07-19T01:15:55.218897+00:00",
+      "requested_decoys": 99898,
+      "matched_decoys": 85084,
+      "max_tanimoto": 0.35,
+      "active_fraction": 0.005,
+      "target": "CHEMBL2039"
+    },
+    {
+      "track": "A_measured",
+      "n_active": 3361,
+      "n_inactive": 350,
+      "chembl_release": "ChEMBL_37",
+      "seed": 20260718,
+      "generated_at": "2026-07-19T01:21:26.949769+00:00",
+      "target": "CHEMBL214",
+      "active_threshold": 7.0,
+      "inactive_threshold": 5.0,
+      "discarded_ambiguous": 1918,
+      "raw_records": 6947
+    },
+    {
+      "track": "B_decoys",
+      "n_active": 502,
+      "n_inactive": 91453,
+      "chembl_release": "ChEMBL_37",
+      "seed": 20260718,
+      "generated_at": "2026-07-19T01:22:34.628846+00:00",
+      "requested_decoys": 99898,
+      "matched_decoys": 91453,
+      "max_tanimoto": 0.35,
+      "active_fraction": 0.005,
+      "target": "CHEMBL214"
+    }
+  ],
+  "splits": [
+    {
+      "target": "CHEMBL217",
+      "track": "A_measured",
+      "split": "scaffold",
+      "n_train": 3157,
+      "n_test": 789,
+      "test_active_ratio": 0.8174904942965779,
+      "random_bedroc_reference": 0.8126212993153125,
+      "results": [
+        {
+          "method": "random",
+          "is_baseline": true,
+          "metrics": {
+            "roc_auc": 0.4399440137812231,
+            "pr_auc": 0.7979210360663469,
+            "ef_1pct": 1.0703488372093024,
+            "ef_5pct": 0.9723315444245676,
+            "bedroc": 0.7934132248191862
+          },
+          "ci": {
+            "bedroc": [
+              0.6937683776668694,
+              0.8798221357236422
+            ],
+            "ef_1pct": [
+              0.6153545951708175,
+              1.2464454976303319
+            ]
+          }
+        },
+        {
+          "method": "descriptor_score",
+          "is_baseline": true,
+          "metrics": {
+            "roc_auc": 0.5419465977605513,
+            "pr_auc": 0.8312380494771011,
+            "ef_1pct": 0.9174418604651163,
+            "ef_5pct": 1.066428145497913,
+            "bedroc": 0.8449319405473152
+          },
+          "ci": {
+            "bedroc": [
+              0.7300113607918232,
+              0.8895796119135085
+            ],
+            "ef_1pct": [
+              0.6063898742284024,
+              1.247480915171876
+            ]
+          }
+        },
+        {
+          "method": "max_tanimoto",
+          "is_baseline": true,
+          "metrics": {
+            "roc_auc": 0.9439653316106804,
+            "pr_auc": 0.9829683746308125,
+            "ef_1pct": 1.2232558139534884,
+            "ef_5pct": 1.1918902802623732,
+            "bedroc": 0.9866400916077441
+          },
+          "ci": {
+            "bedroc": [
+              0.9626954375757634,
+              0.9999973563773189
+            ],
+            "ef_1pct": [
+              1.0507215514724961,
+              1.2716072541686145
+            ]
+          }
+        },
+        {
+          "method": "random_forest",
+          "is_baseline": false,
+          "metrics": {
+            "roc_auc": 0.9676679586563308,
+            "pr_auc": 0.9920673771363044,
+            "ef_1pct": 1.2232558139534884,
+            "ef_5pct": 1.2232558139534884,
+            "bedroc": 0.9999630457565475
+          },
+          "ci": {
+            "bedroc": [
+              0.9998665689822364,
+              0.9999996703666342
+            ],
+            "ef_1pct": [
+              1.1846846846846846,
+              1.2716072541686145
+            ]
+          }
+        },
+        {
+          "method": "svm_linear",
+          "is_baseline": false,
+          "metrics": {
+            "roc_auc": 0.9423557278208442,
+            "pr_auc": 0.9845064984343497,
+            "ef_1pct": 1.2232558139534884,
+            "ef_5pct": 1.2232558139534884,
+            "bedroc": 0.9985141565883388
+          },
+          "ci": {
+            "bedroc": [
+              0.9949200728141658,
+              0.9999925943209899
+            ],
+            "ef_1pct": [
+              1.1846846846846846,
+              1.2716072541686145
+            ]
+          }
+        }
+      ],
+      "verdict": {
+        "best_baseline": 0.9866400916077441,
+        "best_baseline_name": "max_tanimoto",
+        "winners": [
+          "random_forest",
+          "svm_linear"
+        ],
+        "passed": true,
+        "low_information": true,
+        "underpowered": false,
+        "n_test_actives": 645
+      }
+    },
+    {
+      "target": "CHEMBL217",
+      "track": "A_measured",
+      "split": "random",
+      "n_train": 3157,
+      "n_test": 789,
+      "test_active_ratio": 0.8757921419518377,
+      "random_bedroc_reference": 0.8644913037439248,
+      "results": [
+        {
+          "method": "random",
+          "is_baseline": true,
+          "metrics": {
+            "roc_auc": 0.44177323606721997,
+            "pr_auc": 0.8652661627280138,
+            "ef_1pct": 0.999095513748191,
+            "ef_5pct": 0.9954358232216409,
+            "bedroc": 0.8745261470236739
+          },
+          "ci": {
+            "bedroc": [
+              0.8011291788996966,
+              0.9450708827235182
+            ],
+            "ef_1pct": [
+              0.7125583804762532,
+              1.163716814159292
+            ]
+          }
+        },
+        {
+          "method": "descriptor_score",
+          "is_baseline": true,
+          "metrics": {
+            "roc_auc": 0.599582090433858,
+            "pr_auc": 0.900805500659818,
+            "ef_1pct": 1.141823444283647,
+            "ef_5pct": 1.0832683958588445,
+            "bedroc": 0.9280032289387115
+          },
+          "ci": {
+            "bedroc": [
+              0.8239318549418905,
+              0.9567245228041471
+            ],
+            "ef_1pct": [
+              0.7155689265280845,
+              1.1671597633136095
+            ]
+          }
+        },
+        {
+          "method": "max_tanimoto",
+          "is_baseline": true,
+          "metrics": {
+            "roc_auc": 0.9619598924953483,
+            "pr_auc": 0.991205369557262,
+            "ef_1pct": 1.141823444283647,
+            "ef_5pct": 1.141823444283647,
+            "bedroc": 0.9912714846634321
+          },
+          "ci": {
+            "bedroc": [
+              0.953415682786521,
+              0.999999703491628
+            ],
+            "ef_1pct": [
+              0.9947070525397863,
+              1.1750257810836704
+            ]
+          }
+        },
+        {
+          "method": "random_forest",
+          "is_baseline": false,
+          "metrics": {
+            "roc_auc": 0.9882822883132992,
+            "pr_auc": 0.9980331343627248,
+            "ef_1pct": 1.141823444283647,
+            "ef_5pct": 1.141823444283647,
+            "bedroc": 0.99999625685789
+          },
+          "ci": {
+            "bedroc": [
+              0.9999847800869591,
+              0.9999999955860386
+            ],
+            "ef_1pct": [
+              1.1167338653128769,
+              1.1750257810836704
+            ]
+          }
+        },
+        {
+          "method": "svm_linear",
+          "is_baseline": false,
+          "metrics": {
+            "roc_auc": 0.9477170028648217,
+            "pr_auc": 0.9895587842740734,
+            "ef_1pct": 1.141823444283647,
+            "ef_5pct": 1.141823444283647,
+            "bedroc": 0.9983234412929181
+          },
+          "ci": {
+            "bedroc": [
+              0.9934680322160558,
+              0.9999930355469072
+            ],
+            "ef_1pct": [
+              1.1167338653128769,
+              1.1750257810836704
+            ]
+          }
+        }
+      ],
+      "verdict": {
+        "best_baseline": 0.9912714846634321,
+        "best_baseline_name": "max_tanimoto",
+        "winners": [
+          "random_forest",
+          "svm_linear"
+        ],
+        "passed": true,
+        "low_information": true,
+        "underpowered": false,
+        "n_test_actives": 691
+      }
+    },
+    {
+      "target": "CHEMBL217",
+      "track": "B_decoys",
+      "split": "scaffold",
+      "n_train": 72542,
+      "n_test": 18135,
+      "test_active_ratio": 0.009870416322029226,
+      "random_bedroc_reference": 0.055097475507040604,
+      "results": [
+        {
+          "method": "random",
+          "is_baseline": true,
+          "metrics": {
+            "roc_auc": 0.47875284214299135,
+            "pr_auc": 0.012183315332026514,
+            "ef_1pct": 1.1194789962653167,
+            "ef_5pct": 0.7819073253958965,
+            "bedroc": 0.04917252707049633
+          },
+          "ci": {
+            "bedroc": [
+              0.027403291917288304,
+              0.07195461991820797
+            ],
+            "ef_1pct": [
+              0.0,
+              2.7614771080518055
+            ]
+          }
+        },
+        {
+          "method": "descriptor_score",
+          "is_baseline": true,
+          "metrics": {
+            "roc_auc": 0.5053474912604491,
+            "pr_auc": 0.010792098306593854,
+            "ef_1pct": 40.3012438655514,
+            "ef_5pct": 8.042475346929223,
+            "bedroc": 0.42620482349897626
+          },
+          "ci": {
+            "bedroc": [
+              0.042996821325125126,
+              0.09583161541517539
+            ],
+            "ef_1pct": [
+              0.0,
+              3.368342491150545
+            ]
+          }
+        },
+        {
+          "method": "max_tanimoto",
+          "is_baseline": true,
+          "metrics": {
+            "roc_auc": 0.988419084017916,
+            "pr_auc": 0.9070759843286174,
+            "ef_1pct": 88.99858020309267,
+            "ef_5pct": 18.430672670046132,
+            "bedroc": 0.92682892829746
+          },
+          "ci": {
+            "bedroc": [
+              0.8935056145121519,
+              0.9555455460049473
+            ],
+            "ef_1pct": [
+              84.07863765972951,
+              93.18245900341344
+            ]
+          }
+        },
+        {
+          "method": "random_forest",
+          "is_baseline": false,
+          "metrics": {
+            "roc_auc": 0.9894038002267492,
+            "pr_auc": 0.9007770756268565,
+            "ef_1pct": 80.6024877311028,
+            "ef_5pct": 19.435982088412285,
+            "bedroc": 0.9594826539422667
+          },
+          "ci": {
+            "bedroc": [
+              0.9390473219383433,
+              0.9760301433957415
+            ],
+            "ef_1pct": [
+              75.97026170394605,
+              86.4480921961326
+            ]
+          }
+        },
+        {
+          "method": "svm_linear",
+          "is_baseline": false,
+          "metrics": {
+            "roc_auc": 0.9908276718633133,
+            "pr_auc": 0.8729710192386927,
+            "ef_1pct": 79.48300873483748,
+            "ef_5pct": 18.765775809501516,
+            "bedroc": 0.935735347201028
+          },
+          "ci": {
+            "bedroc": [
+              0.9096919866174079,
+              0.9571876805253147
+            ],
+            "ef_1pct": [
+              74.815068324187,
+              85.55412442377487
+            ]
+          }
+        }
+      ],
+      "verdict": {
+        "best_baseline": 0.92682892829746,
+        "best_baseline_name": "max_tanimoto",
+        "winners": [
+          "random_forest"
+        ],
+        "passed": true,
+        "low_information": false,
+        "underpowered": false,
+        "n_test_actives": 179
+      }
+    },
+    {
+      "target": "CHEMBL217",
+      "track": "B_decoys",
+      "split": "random",
+      "n_train": 72542,
+      "n_test": 18135,
+      "test_active_ratio": 0.005459057071960298,
+      "random_bedroc_reference": 0.05277918522460958,
+      "results": [
+        {
+          "method": "random",
+          "is_baseline": true,
+          "metrics": {
+            "roc_auc": 0.5016773411650325,
+            "pr_auc": 0.005313070147839988,
+            "ef_1pct": 0.0,
+            "ef_5pct": 0.6058935551769069,
+            "bedroc": 0.036888385904860085
+          },
+          "ci": {
+            "bedroc": [
+              0.017271303521086672,
+              0.060887483994983
+            ],
+            "ef_1pct": [
+              0.0,
+              0.0
+            ]
+          }
+        },
+        {
+          "method": "descriptor_score",
+          "is_baseline": true,
+          "metrics": {
+            "roc_auc": 0.5301557379069022,
+            "pr_auc": 0.006381776165479407,
+            "ef_1pct": 45.54244098442994,
+            "ef_5pct": 9.088403327653603,
+            "bedroc": 0.46816729531230195
+          },
+          "ci": {
+            "bedroc": [
+              0.038320920769416816,
+              0.10353026569193396
+            ],
+            "ef_1pct": [
+              0.0,
+              3.862363099014497
+            ]
+          }
+        },
+        {
+          "method": "max_tanimoto",
+          "is_baseline": true,
+          "metrics": {
+            "roc_auc": 0.9869458613636923,
+            "pr_auc": 0.9370716964110832,
+            "ef_1pct": 93.10899045705676,
+            "ef_5pct": 18.984664728876414,
+            "bedroc": 0.9540645664682831
+          },
+          "ci": {
+            "bedroc": [
+              0.9167625518644698,
+              0.9877681707341925
+            ],
+            "ef_1pct": [
+              87.72139415231052,
+              97.64767372146993
+            ]
+          }
+        },
+        {
+          "method": "random_forest",
+          "is_baseline": false,
+          "metrics": {
+            "roc_auc": 0.9900849255473342,
+            "pr_auc": 0.90432683512647,
+            "ef_1pct": 91.08488196885988,
+            "ef_5pct": 19.38859376566102,
+            "bedroc": 0.9562307908805402
+          },
+          "ci": {
+            "bedroc": [
+              0.921465651543375,
+              0.9808397365514909
+            ],
+            "ef_1pct": [
+              85.2596257566842,
+              95.71794952285283
+            ]
+          }
+        },
+        {
+          "method": "svm_linear",
+          "is_baseline": false,
+          "metrics": {
+            "roc_auc": 0.9772077618052336,
+            "pr_auc": 0.8873606844369486,
+            "ef_1pct": 90.07282772476142,
+            "ef_5pct": 18.37877117369951,
+            "bedroc": 0.9204046625181044
+          },
+          "ci": {
+            "bedroc": [
+              0.8679364550634002,
+              0.9657844536414754
+            ],
+            "ef_1pct": [
+              83.23564226519336,
+              95.29450852905507
+            ]
+          }
+        }
+      ],
+      "verdict": {
+        "best_baseline": 0.9540645664682831,
+        "best_baseline_name": "max_tanimoto",
+        "winners": [],
+        "passed": false,
+        "low_information": false,
+        "underpowered": false,
+        "n_test_actives": 99
+      }
+    },
+    {
+      "target": "CHEMBL2039",
+      "track": "A_measured",
+      "split": "scaffold",
+      "n_train": 1836,
+      "n_test": 459,
+      "test_active_ratio": 0.3159041394335512,
+      "random_bedroc_reference": 0.3164740876084549,
+      "results": [
+        {
+          "method": "random",
+          "is_baseline": true,
+          "metrics": {
+            "roc_auc": 0.5182956292554359,
+            "pr_auc": 0.3532204160561621,
+            "ef_1pct": 1.2662068965517241,
+            "ef_5pct": 1.238680659670165,
+            "bedroc": 0.4081122670443216
+          },
+          "ci": {
+            "bedroc": [
+              0.26747741029220823,
+              0.5648752036159458
+            ],
+            "ef_1pct": [
+              0.0,
+              2.7306567164179105
+            ]
+          }
+        },
+        {
+          "method": "descriptor_score",
+          "is_baseline": true,
+          "metrics": {
+            "roc_auc": 0.5850867559850648,
+            "pr_auc": 0.362203568164853,
+            "ef_1pct": 1.899310344827586,
+            "ef_5pct": 1.376311844077961,
+            "bedroc": 0.44126065310265594
+          },
+          "ci": {
+            "bedroc": [
+              0.24282118745691075,
+              0.5016758180250527
+            ],
+            "ef_1pct": [
+              0.0,
+              2.5955439017081208
+            ]
+          }
+        },
+        {
+          "method": "max_tanimoto",
+          "is_baseline": true,
+          "metrics": {
+            "roc_auc": 0.7939710081265099,
+            "pr_auc": 0.694742060213458,
+            "ef_1pct": 3.1655172413793102,
+            "ef_5pct": 3.0278860569715143,
+            "bedroc": 0.8784615196757475
+          },
+          "ci": {
+            "bedroc": [
+              0.7913570731460664,
+              0.9388977117648953
+            ],
+            "ef_1pct": [
+              2.6372601156069364,
+              3.672
+            ]
+          }
+        },
+        {
+          "method": "random_forest",
+          "is_baseline": false,
+          "metrics": {
+            "roc_auc": 0.9187129365253679,
+            "pr_auc": 0.8511052994655385,
+            "ef_1pct": 3.1655172413793102,
+            "ef_5pct": 3.0278860569715143,
+            "bedroc": 0.9482614769766495
+          },
+          "ci": {
+            "bedroc": [
+              0.898065941839926,
+              0.9807147710939544
+            ],
+            "ef_1pct": [
+              2.7898752771618622,
+              3.7033463414634133
+            ]
+          }
+        },
+        {
+          "method": "svm_linear",
+          "is_baseline": false,
+          "metrics": {
+            "roc_auc": 0.8477267735558972,
+            "pr_auc": 0.729923628609765,
+            "ef_1pct": 3.1655172413793102,
+            "ef_5pct": 2.752623688155922,
+            "bedroc": 0.8447722587842451
+          },
+          "ci": {
+            "bedroc": [
+              0.7335016325907754,
+              0.9173828971097804
+            ],
+            "ef_1pct": [
+              2.699299283712239,
+              3.7033463414634133
+            ]
+          }
+        }
+      ],
+      "verdict": {
+        "best_baseline": 0.8784615196757475,
+        "best_baseline_name": "max_tanimoto",
+        "winners": [
+          "random_forest"
+        ],
+        "passed": true,
+        "low_information": false,
+        "underpowered": false,
+        "n_test_actives": 145
+      }
+    },
+    {
+      "target": "CHEMBL2039",
+      "track": "A_measured",
+      "split": "random",
+      "n_train": 1836,
+      "n_test": 459,
+      "test_active_ratio": 0.4226579520697168,
+      "random_bedroc_reference": 0.4227425119043811,
+      "results": [
+        {
+          "method": "random",
+          "is_baseline": true,
+          "metrics": {
+            "roc_auc": 0.5247033651040653,
+            "pr_auc": 0.45098882138037727,
+            "ef_1pct": 0.9463917525773196,
+            "ef_5pct": 1.2344240251008516,
+            "bedroc": 0.4798096235700856
+          },
+          "ci": {
+            "bedroc": [
+              0.3277848234527711,
+              0.6165644327427167
+            ],
+            "ef_1pct": [
+              0.0,
+              2.0475041907245286
+            ]
+          }
+        },
+        {
+          "method": "descriptor_score",
+          "is_baseline": true,
+          "metrics": {
+            "roc_auc": 0.6087239836607664,
+            "pr_auc": 0.48609362706385956,
+            "ef_1pct": 0.9463917525773196,
+            "ef_5pct": 1.6458987001344687,
+            "bedroc": 0.5819049852479736
+          },
+          "ci": {
+            "bedroc": [
+              0.35480265564146163,
+              0.6353527050806536
+            ],
+            "ef_1pct": [
+              0.0,
+              2.0123455233291296
+            ]
+          }
+        },
+        {
+          "method": "max_tanimoto",
+          "is_baseline": true,
+          "metrics": {
+            "roc_auc": 0.9227679439797705,
+            "pr_auc": 0.8972179062785385,
+            "ef_1pct": 2.365979381443299,
+            "ef_5pct": 2.16024204392649,
+            "bedroc": 0.9470611061545678
+          },
+          "ci": {
+            "bedroc": [
+              0.8716898083897214,
+              0.9953418414242723
+            ],
+            "ef_1pct": [
+              2.1296947674418605,
+              2.6612775574674012
+            ]
+          }
+        },
+        {
+          "method": "random_forest",
+          "is_baseline": false,
+          "metrics": {
+            "roc_auc": 0.9738961291577515,
+            "pr_auc": 0.9686091464065665,
+            "ef_1pct": 2.365979381443299,
+            "ef_5pct": 2.365979381443299,
+            "bedroc": 0.9981364675144779
+          },
+          "ci": {
+            "bedroc": [
+              0.9949145487590744,
+              0.9997305346799165
+            ],
+            "ef_1pct": [
+              2.1296947674418605,
+              2.6612775574674012
+            ]
+          }
+        },
+        {
+          "method": "svm_linear",
+          "is_baseline": false,
+          "metrics": {
+            "roc_auc": 0.9257342929391169,
+            "pr_auc": 0.902184152962398,
+            "ef_1pct": 2.365979381443299,
+            "ef_5pct": 2.263110712684895,
+            "bedroc": 0.9586728815997204
+          },
+          "ci": {
+            "bedroc": [
+              0.8977571290067563,
+              0.9928491916123368
+            ],
+            "ef_1pct": [
+              2.1296947674418605,
+              2.6612775574674012
+            ]
+          }
+        }
+      ],
+      "verdict": {
+        "best_baseline": 0.9470611061545678,
+        "best_baseline_name": "max_tanimoto",
+        "winners": [
+          "random_forest"
+        ],
+        "passed": true,
+        "low_information": false,
+        "underpowered": false,
+        "n_test_actives": 194
+      }
+    },
+    {
+      "target": "CHEMBL2039",
+      "track": "B_decoys",
+      "split": "scaffold",
+      "n_train": 68469,
+      "n_test": 17117,
+      "test_active_ratio": 0.0040310802126540864,
+      "random_bedroc_reference": 0.05204261762715984,
+      "results": [
+        {
+          "method": "random",
+          "is_baseline": true,
+          "metrics": {
+            "roc_auc": 0.5175234121559587,
+            "pr_auc": 0.004206701977855816,
+            "ef_1pct": 0.0,
+            "ef_5pct": 0.5796085602058784,
+            "bedroc": 0.043403645637599714
+          },
+          "ci": {
+            "bedroc": [
+              0.019128330292257453,
+              0.07294956624956724
+            ],
+            "ef_1pct": [
+              0.0,
+              0.0
+            ]
+          }
+        },
+        {
+          "method": "descriptor_score",
+          "is_baseline": true,
+          "metrics": {
+            "roc_auc": 0.6715607763926575,
+            "pr_auc": 0.006816014198187096,
+            "ef_1pct": 65.28222730739893,
+            "ef_5pct": 13.041192604632263,
+            "bedroc": 0.6614044209204203
+          },
+          "ci": {
+            "bedroc": [
+              0.059384774660595205,
+              0.1505303378892233
+            ],
+            "ef_1pct": [
+              0.0,
+              5.772344184103668
+            ]
+          }
+        },
+        {
+          "method": "max_tanimoto",
+          "is_baseline": true,
+          "metrics": {
+            "roc_auc": 0.9622306836961622,
+            "pr_auc": 0.8313116173437725,
+            "ef_1pct": 84.14153741842529,
+            "ef_5pct": 17.38825680617635,
+            "bedroc": 0.8741478354675535
+          },
+          "ci": {
+            "bedroc": [
+              0.7966842269449231,
+              0.9398482157949936
+            ],
+            "ef_1pct": [
+              74.4146891324523,
+              92.07342605763658
+            ]
+          }
+        },
+        {
+          "method": "random_forest",
+          "is_baseline": false,
+          "metrics": {
+            "roc_auc": 0.9740358000258436,
+            "pr_auc": 0.787713804757926,
+            "ef_1pct": 82.69082125603865,
+            "ef_5pct": 18.25766964648517,
+            "bedroc": 0.899345000451975
+          },
+          "ci": {
+            "bedroc": [
+              0.8366393522878036,
+              0.9548921604310541
+            ],
+            "ef_1pct": [
+              74.09438955497995,
+              91.5220966783482
+            ]
+          }
+        },
+        {
+          "method": "svm_linear",
+          "is_baseline": false,
+          "metrics": {
+            "roc_auc": 0.9470387108182183,
+            "pr_auc": 0.5793373059151311,
+            "ef_1pct": 73.98652428171879,
+            "ef_5pct": 16.80864824597047,
+            "bedroc": 0.8096714293752102
+          },
+          "ci": {
+            "bedroc": [
+              0.7282533493937909,
+              0.8806733527245788
+            ],
+            "ef_1pct": [
+              64.77190388443914,
+              84.29424438288704
+            ]
+          }
+        }
+      ],
+      "verdict": {
+        "best_baseline": 0.8741478354675535,
+        "best_baseline_name": "max_tanimoto",
+        "winners": [],
+        "passed": false,
+        "low_information": false,
+        "underpowered": false,
+        "n_test_actives": 69
+      }
+    },
+    {
+      "target": "CHEMBL2039",
+      "track": "B_decoys",
+      "split": "random",
+      "n_train": 68469,
+      "n_test": 17117,
+      "test_active_ratio": 0.0057837237833732544,
+      "random_bedroc_reference": 0.05294759959645049,
+      "results": [
+        {
+          "method": "random",
+          "is_baseline": true,
+          "metrics": {
+            "roc_auc": 0.5022703234008911,
+            "pr_auc": 0.005633236623363299,
+            "ef_1pct": 0.0,
+            "ef_5pct": 0.6059544038516002,
+            "bedroc": 0.03687089963722515
+          },
+          "ci": {
+            "bedroc": [
+              0.016971001968352613,
+              0.06129112800879793
+            ],
+            "ef_1pct": [
+              0.0,
+              0.0
+            ]
+          }
+        },
+        {
+          "method": "descriptor_score",
+          "is_baseline": true,
+          "metrics": {
+            "roc_auc": 0.7507707228590998,
+            "pr_auc": 0.012405153758743691,
+            "ef_1pct": 82.91062673518813,
+            "ef_5pct": 16.56275370527707,
+            "bedroc": 0.8364639258685636
+          },
+          "ci": {
+            "bedroc": [
+              0.07853909306612408,
+              0.16044085214429005
+            ],
+            "ef_1pct": [
+              0.0,
+              5.588364288620477
+            ]
+          }
+        },
+        {
+          "method": "max_tanimoto",
+          "is_baseline": true,
+          "metrics": {
+            "roc_auc": 0.9771418498060876,
+            "pr_auc": 0.9322085213010703,
+            "ef_1pct": 93.02167877606473,
+            "ef_5pct": 18.784586519399603,
+            "bedroc": 0.9409532589342195
+          },
+          "ci": {
+            "bedroc": [
+              0.8948861180489068,
+              0.980867237304852
+            ],
+            "ef_1pct": [
+              87.2536501064427,
+              97.86311179008695
+            ]
+          }
+        },
+        {
+          "method": "random_forest",
+          "is_baseline": false,
+          "metrics": {
+            "roc_auc": 0.9947892368270791,
+            "pr_auc": 0.9166864063155555,
+            "ef_1pct": 93.02167877606473,
+            "ef_5pct": 19.390540923251205,
+            "bedroc": 0.9596791349398266
+          },
+          "ci": {
+            "bedroc": [
+              0.9202521610609101,
+              0.9859628070574192
+            ],
+            "ef_1pct": [
+              87.46550843127235,
+              97.71717681873002
+            ]
+          }
+        },
+        {
+          "method": "svm_linear",
+          "is_baseline": false,
+          "metrics": {
+            "roc_auc": 0.9773757079550945,
+            "pr_auc": 0.854604193211984,
+            "ef_1pct": 86.95504755153878,
+            "ef_5pct": 18.178632115548005,
+            "bedroc": 0.9149374444856707
+          },
+          "ci": {
+            "bedroc": [
+              0.865656032284023,
+              0.9561455802561514
+            ],
+            "ef_1pct": [
+              79.29891453953954,
+              92.31390513320338
+            ]
+          }
+        }
+      ],
+      "verdict": {
+        "best_baseline": 0.9409532589342195,
+        "best_baseline_name": "max_tanimoto",
+        "winners": [],
+        "passed": false,
+        "low_information": false,
+        "underpowered": false,
+        "n_test_actives": 99
+      }
+    },
+    {
+      "target": "CHEMBL214",
+      "track": "A_measured",
+      "split": "scaffold",
+      "n_train": 2969,
+      "n_test": 742,
+      "test_active_ratio": 0.8221024258760108,
+      "random_bedroc_reference": 0.816884206911131,
+      "results": [
+        {
+          "method": "random",
+          "is_baseline": true,
+          "metrics": {
+            "roc_auc": 0.5355439642324888,
+            "pr_auc": 0.8386289640672057,
+            "ef_1pct": 0.8688524590163934,
+            "ef_5pct": 1.0520159503766062,
+            "bedroc": 0.8444024962442741
+          },
+          "ci": {
+            "bedroc": [
+              0.7450851462251349,
+              0.9154477156336492
+            ],
+            "ef_1pct": [
+              0.506228700097371,
+              1.2295463905637376
+            ]
+          }
+        },
+        {
+          "method": "descriptor_score",
+          "is_baseline": true,
+          "metrics": {
+            "roc_auc": 0.6523099850968703,
+            "pr_auc": 0.8786022364088755,
+            "ef_1pct": 1.2163934426229508,
+            "ef_5pct": 1.1506424457244129,
+            "bedroc": 0.9643658038318085
+          },
+          "ci": {
+            "bedroc": [
+              0.810840366216785,
+              0.9635606328538692
+            ],
+            "ef_1pct": [
+              0.7084086632682117,
+              1.2470588235294118
+            ]
+          }
+        },
+        {
+          "method": "max_tanimoto",
+          "is_baseline": true,
+          "metrics": {
+            "roc_auc": 0.9756768504719324,
+            "pr_auc": 0.9944274123263313,
+            "ef_1pct": 1.2163934426229508,
+            "ef_5pct": 1.2163934426229508,
+            "bedroc": 0.9999943959424672
+          },
+          "ci": {
+            "bedroc": [
+              0.9999806126217019,
+              0.9999999003162924
+            ],
+            "ef_1pct": [
+              1.179650238473768,
+              1.254491785567293
+            ]
+          }
+        },
+        {
+          "method": "random_forest",
+          "is_baseline": false,
+          "metrics": {
+            "roc_auc": 0.9890710382513661,
+            "pr_auc": 0.9976910945312825,
+            "ef_1pct": 1.2163934426229508,
+            "ef_5pct": 1.2163934426229508,
+            "bedroc": 0.9999999433916177
+          },
+          "ci": {
+            "bedroc": [
+              0.9999998701177373,
+              0.9999999770974614
+            ],
+            "ef_1pct": [
+              1.179650238473768,
+              1.254491785567293
+            ]
+          }
+        },
+        {
+          "method": "svm_linear",
+          "is_baseline": false,
+          "metrics": {
+            "roc_auc": 0.9723050173869847,
+            "pr_auc": 0.9928909995605678,
+            "ef_1pct": 1.2163934426229508,
+            "ef_5pct": 1.2163934426229508,
+            "bedroc": 0.9999230330075787
+          },
+          "ci": {
+            "bedroc": [
+              0.9997521441194608,
+              0.9999996881574318
+            ],
+            "ef_1pct": [
+              1.179650238473768,
+              1.254491785567293
+            ]
+          }
+        }
+      ],
+      "verdict": {
+        "best_baseline": 0.9999943959424672,
+        "best_baseline_name": "max_tanimoto",
+        "winners": [
+          "random_forest"
+        ],
+        "passed": true,
+        "low_information": true,
+        "underpowered": false,
+        "n_test_actives": 610
+      }
+    },
+    {
+      "target": "CHEMBL214",
+      "track": "A_measured",
+      "split": "random",
+      "n_train": 2969,
+      "n_test": 742,
+      "test_active_ratio": 0.9110512129380054,
+      "random_bedroc_reference": 0.8929861029737469,
+      "results": [
+        {
+          "method": "random",
+          "is_baseline": true,
+          "metrics": {
+            "roc_auc": 0.5203066164604626,
+            "pr_auc": 0.9160351086605265,
+            "ef_1pct": 0.9408284023668638,
+            "ef_5pct": 1.008635854789701,
+            "bedroc": 0.8971641094869152
+          },
+          "ci": {
+            "bedroc": [
+              0.8178085740976715,
+              0.9694259527914463
+            ],
+            "ef_1pct": [
+              0.6253687315634218,
+              1.1157894736842104
+            ]
+          }
+        },
+        {
+          "method": "descriptor_score",
+          "is_baseline": true,
+          "metrics": {
+            "roc_auc": 0.6666106329567868,
+            "pr_auc": 0.9412598257442968,
+            "ef_1pct": 1.0976331360946745,
+            "ef_5pct": 1.0976331360946745,
+            "bedroc": 0.9584817241301415
+          },
+          "ci": {
+            "bedroc": [
+              0.8666978237312474,
+              0.9853159898327821
+            ],
+            "ef_1pct": [
+              0.7961608372660148,
+              1.120845921450151
+            ]
+          }
+        },
+        {
+          "method": "max_tanimoto",
+          "is_baseline": true,
+          "metrics": {
+            "roc_auc": 0.9773287609826071,
+            "pr_auc": 0.9974405672706632,
+            "ef_1pct": 1.0976331360946745,
+            "ef_5pct": 1.0976331360946745,
+            "bedroc": 0.9999994051087497
+          },
+          "ci": {
+            "bedroc": [
+              0.9999982404352867,
+              0.9999999931768099
+            ],
+            "ef_1pct": [
+              1.0769230769230769,
+              1.125948406676783
+            ]
+          }
+        },
+        {
+          "method": "random_forest",
+          "is_baseline": false,
+          "metrics": {
+            "roc_auc": 0.9965931504393043,
+            "pr_auc": 0.999659822866868,
+            "ef_1pct": 1.0976331360946745,
+            "ef_5pct": 1.0976331360946745,
+            "bedroc": 0.999999998029035
+          },
+          "ci": {
+            "bedroc": [
+              0.9999999951445235,
+              0.9999999994204676
+            ],
+            "ef_1pct": [
+              1.0769230769230769,
+              1.125948406676783
+            ]
+          }
+        },
+        {
+          "method": "svm_linear",
+          "is_baseline": false,
+          "metrics": {
+            "roc_auc": 0.9923570019723866,
+            "pr_auc": 0.9991425183985021,
+            "ef_1pct": 1.0976331360946745,
+            "ef_5pct": 1.0976331360946745,
+            "bedroc": 0.9999997960854479
+          },
+          "ci": {
+            "bedroc": [
+              0.9999992429338894,
+              0.9999999996099013
+            ],
+            "ef_1pct": [
+              1.0769230769230769,
+              1.125948406676783
+            ]
+          }
+        }
+      ],
+      "verdict": {
+        "best_baseline": 0.9999994051087497,
+        "best_baseline_name": "max_tanimoto",
+        "winners": [
+          "random_forest"
+        ],
+        "passed": true,
+        "low_information": true,
+        "underpowered": false,
+        "n_test_actives": 676
+      }
+    },
+    {
+      "target": "CHEMBL214",
+      "track": "B_decoys",
+      "split": "scaffold",
+      "n_train": 73564,
+      "n_test": 18391,
+      "test_active_ratio": 0.009515523897558588,
+      "random_bedroc_reference": 0.0549085771224783,
+      "results": [
+        {
+          "method": "random",
+          "is_baseline": true,
+          "metrics": {
+            "roc_auc": 0.4781102955015999,
+            "pr_auc": 0.011867576435369235,
+            "ef_1pct": 1.1422981366459628,
+            "ef_5pct": 0.6853788819875777,
+            "bedroc": 0.046931513112621726
+          },
+          "ci": {
+            "bedroc": [
+              0.02685787492553293,
+              0.07178744191983823
+            ],
+            "ef_1pct": [
+              0.0,
+              2.802260627135969
+            ]
+          }
+        },
+        {
+          "method": "descriptor_score",
+          "is_baseline": true,
+          "metrics": {
+            "roc_auc": 0.5465040153083631,
+            "pr_auc": 0.011677640287256185,
+            "ef_1pct": 46.83422360248447,
+            "ef_5pct": 9.366844720496895,
+            "bedroc": 0.4924017706445955
+          },
+          "ci": {
+            "bedroc": [
+              0.0520657485009022,
+              0.1072449415173719
+            ],
+            "ef_1pct": [
+              0.0,
+              3.307071199018384
+            ]
+          }
+        },
+        {
+          "method": "max_tanimoto",
+          "is_baseline": true,
+          "metrics": {
+            "roc_auc": 0.9924465148378192,
+            "pr_auc": 0.9444227718720295,
+            "ef_1pct": 92.526149068323,
+            "ef_5pct": 19.190608695652173,
+            "bedroc": 0.961702004446395
+          },
+          "ci": {
+            "bedroc": [
+              0.9344210961018887,
+              0.9817405762072472
+            ],
+            "ef_1pct": [
+              88.23390024002734,
+              96.0499995859739
+            ]
+          }
+        },
+        {
+          "method": "random_forest",
+          "is_baseline": false,
+          "metrics": {
+            "roc_auc": 0.9983537235711148,
+            "pr_auc": 0.936766267109804,
+            "ef_1pct": 87.95695652173914,
+            "ef_5pct": 19.87598757763975,
+            "bedroc": 0.9771109824320384
+          },
+          "ci": {
+            "bedroc": [
+              0.9639083804395384,
+              0.9872418550591018
+            ],
+            "ef_1pct": [
+              83.29060198730957,
+              92.218804573128
+            ]
+          }
+        },
+        {
+          "method": "svm_linear",
+          "is_baseline": false,
+          "metrics": {
+            "roc_auc": 0.9958024342806951,
+            "pr_auc": 0.8877617344802634,
+            "ef_1pct": 81.10316770186336,
+            "ef_5pct": 19.419068322981367,
+            "bedroc": 0.9542596685493073
+          },
+          "ci": {
+            "bedroc": [
+              0.9359563584694301,
+              0.9736343809931504
+            ],
+            "ef_1pct": [
+              76.50947172472362,
+              86.88317683543367
+            ]
+          }
+        }
+      ],
+      "verdict": {
+        "best_baseline": 0.961702004446395,
+        "best_baseline_name": "max_tanimoto",
+        "winners": [
+          "random_forest"
+        ],
+        "passed": true,
+        "low_information": false,
+        "underpowered": false,
+        "n_test_actives": 175
+      }
+    },
+    {
+      "target": "CHEMBL214",
+      "track": "B_decoys",
+      "split": "random",
+      "n_train": 73564,
+      "n_test": 18391,
+      "test_active_ratio": 0.005165570115817519,
+      "random_bedroc_reference": 0.05262724673295963,
+      "results": [
+        {
+          "method": "random",
+          "is_baseline": true,
+          "metrics": {
+            "roc_auc": 0.5005690055922491,
+            "pr_auc": 0.00504177086728492,
+            "ef_1pct": 0.0,
+            "ef_5pct": 0.6312700228832951,
+            "bedroc": 0.03803691516935742
+          },
+          "ci": {
+            "bedroc": [
+              0.019355369366075126,
+              0.06067647628466606
+            ],
+            "ef_1pct": [
+              0.0,
+              0.0
+            ]
+          }
+        },
+        {
+          "method": "descriptor_score",
+          "is_baseline": true,
+          "metrics": {
+            "roc_auc": 0.5592746760868066,
+            "pr_auc": 0.006436642145602822,
+            "ef_1pct": 47.34525171624714,
+            "ef_5pct": 9.469050343249428,
+            "bedroc": 0.4866555042801232
+          },
+          "ci": {
+            "bedroc": [
+              0.03814119182498398,
+              0.10838460611331348
+            ],
+            "ef_1pct": [
+              0.0,
+              3.998043478260869
+            ]
+          }
+        },
+        {
+          "method": "max_tanimoto",
+          "is_baseline": true,
+          "metrics": {
+            "roc_auc": 0.9906548454652153,
+            "pr_auc": 0.9506516730103579,
+            "ef_1pct": 94.69050343249428,
+            "ef_5pct": 19.148524027459956,
+            "bedroc": 0.9587249662742946
+          },
+          "ci": {
+            "bedroc": [
+              0.9205278550855254,
+              0.9932594327523193
+            ],
+            "ef_1pct": [
+              89.83621038892977,
+              98.87079514185316
+            ]
+          }
+        },
+        {
+          "method": "random_forest",
+          "is_baseline": false,
+          "metrics": {
+            "roc_auc": 0.9960788092881965,
+            "pr_auc": 0.940968970247753,
+            "ef_1pct": 93.63838672768878,
+            "ef_5pct": 19.779794050343252,
+            "bedroc": 0.9773897203437333
+          },
+          "ci": {
+            "bedroc": [
+              0.9490917993718333,
+              0.9949467987131676
+            ],
+            "ef_1pct": [
+              88.72062774792379,
+              97.85836107336958
+            ]
+          }
+        },
+        {
+          "method": "svm_linear",
+          "is_baseline": false,
+          "metrics": {
+            "roc_auc": 0.9945682691643845,
+            "pr_auc": 0.9212725453860323,
+            "ef_1pct": 93.63838672768878,
+            "ef_5pct": 19.569370709382152,
+            "bedroc": 0.963723936897028
+          },
+          "ci": {
+            "bedroc": [
+              0.9317129280846158,
+              0.9886386305725148
+            ],
+            "ef_1pct": [
+              87.87047091528167,
+              97.68046882457647
+            ]
+          }
+        }
+      ],
+      "verdict": {
+        "best_baseline": 0.9587249662742946,
+        "best_baseline_name": "max_tanimoto",
+        "winners": [],
+        "passed": false,
+        "low_information": false,
+        "underpowered": false,
+        "n_test_actives": 95
+      }
+    }
+  ]
+}

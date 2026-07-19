@@ -161,6 +161,12 @@ class SVMModel(_SklearnModel):
 
     Wrapped in calibration because LinearSVC emits decision-function margins,
     and the benchmark ranks on probabilities.
+
+    max_iter is raised well above the sklearn default of 1000: at Track B scale
+    (~80k training compounds) liblinear hits the cap and stops before
+    converging, which silently produces a fitted-looking model whose scores
+    mean nothing. dual=False is set explicitly because samples vastly outnumber
+    features here (80k vs 2048), which is the regime the primal solver is for.
     """
 
     name = "svm_linear"
@@ -168,7 +174,12 @@ class SVMModel(_SklearnModel):
     def __init__(self, seed: int = provenance.DEFAULT_SEED):
         super().__init__(
             CalibratedClassifierCV(
-                LinearSVC(random_state=seed, class_weight="balanced", dual="auto"),
+                LinearSVC(
+                    random_state=seed,
+                    class_weight="balanced",
+                    dual=False,
+                    max_iter=20000,
+                ),
                 ensemble=False,
             )
         )

@@ -1,0 +1,248 @@
+# Does machine learning beat similarity search for CNS virtual screening?
+
+A retrospective benchmark on three CNS targets, ChEMBL_37.
+
+---
+
+## Summary
+
+**No, not reliably — and the answer depends on which metric you ask about.**
+
+Random forest over ECFP4 fingerprints beat nearest-neighbour Tanimoto similarity on BEDROC
+for two of three targets. But similarity search beat random forest on **enrichment at 1% for
+all three**, which is the metric that governs what you would actually assay.
+
+On that evidence, NeuroLab ships **similarity search**, not the machine-learning models. The
+ML advantage is narrow, metric-dependent, does not replicate across targets, and does not
+justify the cost of shipping a trained model, versioning it, and retraining it.
+
+A secondary finding proved more consequential than the primary one: **the similarity baseline
+gets substantially stronger as you give it more reference actives.** Benchmarks that
+under-resource the baseline will overstate how much ML adds.
+
+---
+
+## The question
+
+The platform previously ranked compounds by a descriptor score built from molecular weight,
+LogP, TPSA and hydrogen-bond counts. Direct testing showed it does not work: it ties
+haloperidol (an antipsychotic) with aspirin, and ranks benzene and hexane above caffeine.
+This is expected — those descriptors measure drug-likeness, which carries no information
+about whether a compound binds a *particular* protein.
+
+The question was therefore whether a method exists that does predict target-specific
+activity, and whether it can be shown to work rather than assumed to.
+
+## Pre-registration
+
+Criteria were fixed before the first run and not altered afterward:
+
+> A method is validated only if it beats **all three** baselines — random, the existing
+> descriptor score, and nearest-neighbour Tanimoto similarity — on BEDROC, with the lower
+> bound of its 95% bootstrap interval above the best baseline.
+
+The third baseline is the one that matters. A large share of published QSAR models never beat
+plain similarity search, and reporting a win over random alone is the most common way this
+class of work misleads.
+
+## Methods
+
+**Data.** ChEMBL_37, pinned and cached. Actives are compounds with median pChEMBL >= 7.0
+across repeat measurements; inactives are pChEMBL <= 5.0 or an explicit "Not Active" comment.
+The 5.0-7.0 band is discarded because between-laboratory measurement error is comparable to
+that window's width, so those labels would be noise. Median rather than max across repeat
+measurements, so a compound is represented by its consensus rather than its most flattering
+assay.
+
+**Two tracks, reported separately and never pooled.**
+
+- *Track A* uses measured inactives. Most defensible, but publication bias means actives
+  vastly outnumber inactives for well-studied targets, so the class ratio is unrealistic. It
+  measures **discrimination**, not screening.
+- *Track B* pads actives with property-matched decoys to a realistic ~0.5% hit rate. Decoys
+  match on molecular weight, cLogP, HBD, HBA, rotatable bonds and formal charge, and are
+  required to be topologically dissimilar (ECFP4 Tanimoto < 0.35) so a "decoy" is not an
+  unlabelled active. It measures **retrieval from a haystack**, which is what virtual
+  screening actually is.
+
+**Splitting.** Bemis-Murcko scaffold split, large scaffold groups packed into train so the
+test set consists of rare and singleton scaffolds. ChEMBL actives arrive as congeneric series
+from individual publications; a random split places near-identical analogs on both sides and
+inflates every metric. A random split is reported alongside purely as a diagnostic — the gap
+between the two quantifies the analog bias present.
+
+**Metrics.** Enrichment factor at 1% and 5%, and BEDROC (alpha=20), as primaries. ROC-AUC and
+PR-AUC as secondaries. ROC-AUC weights the whole ranked list equally while screening only ever
+uses the top slice, so a model can post a respectable AUC while its top 100 is worthless. EF
+and BEDROC were implemented directly, since scikit-learn provides neither, and validated
+against their closed forms.
+
+**Methods compared.** Random baseline; the existing descriptor score; max ECFP4 Tanimoto to
+training actives; random forest (300 trees) on ECFP4; linear SVM on ECFP4.
+
+## Results
+
+Track B, scaffold split — the realistic screening condition. ChEMBL_37, seed 20260718,
+95% bootstrap intervals from 300 resamples.
+
+| target | method | BEDROC | 95% CI | EF@1% | ROC-AUC |
+|---|---|---|---|---|---|
+| **D2** (CHEMBL217) | random | 0.049 | [0.027, 0.072] | 1.1 | 0.479 |
+| 179 test actives | descriptor score | 0.426 | [0.043, 0.096] | 40.3 | 0.505 |
+| | max Tanimoto | 0.927 | [0.894, 0.956] | **89.0** | 0.988 |
+| | random forest | **0.959** | [0.939, 0.976] | 80.6 | 0.989 |
+| | linear SVM | 0.936 | [0.910, 0.957] | 79.5 | 0.991 |
+| **MAO-B** (CHEMBL2039) | random | 0.043 | [0.019, 0.073] | 0.0 | 0.518 |
+| 69 test actives | descriptor score | 0.661 | [0.059, 0.151] | 65.3 | 0.672 |
+| | max Tanimoto | **0.874** | [0.797, 0.940] | **84.1** | 0.962 |
+| | random forest | 0.899 | [0.837, 0.955] | 82.7 | 0.974 |
+| | linear SVM | 0.810 | [0.728, 0.881] | 74.0 | 0.947 |
+| **5-HT1A** (CHEMBL214) | random | 0.047 | [0.027, 0.072] | 1.1 | 0.478 |
+| 175 test actives | descriptor score | 0.492 | [0.052, 0.107] | 46.8 | 0.547 |
+| | max Tanimoto | 0.962 | [0.934, 0.982] | **92.5** | 0.992 |
+| | random forest | **0.977** | [0.964, 0.987] | 88.0 | 0.998 |
+| | linear SVM | 0.954 | [0.936, 0.975] | 81.1 | 0.996 |
+
+Bold marks the best non-random value in each group. Random forest clears the similarity
+baseline outside its confidence interval on D2 and 5-HT1A. On MAO-B the intervals overlap, so
+that comparison is unresolved rather than a loss. The linear SVM never clears it on any
+target, and loses outright on MAO-B.
+
+The pre-registered criterion required beating all three baselines on **every** target. It was
+not met.
+
+**A note on the SVM.** At Track B scale liblinear hit its default 1000-iteration cap without
+converging, which produces a fitted-looking model whose scores are unreliable. That was fixed
+(primal solver, `max_iter=20000`) and the panel re-run. The corrected numbers differ from the
+originals by at most 0.001 — the non-convergence turned out to be numerically immaterial for
+ranking. Reported because the warning was real and the check was worth doing, not because it
+rescued a result. Random forest values were bit-identical across both runs, confirming the
+pipeline is deterministic under a fixed seed.
+
+### Finding 1 — the metrics disagree, and the disagreement matters
+
+Random forest wins on BEDROC for two of three targets. Similarity search wins on EF@1% for
+**all three**, by 2-8 percentage points.
+
+These measure different things. BEDROC weights a broad early region of the ranked list; EF@1%
+asks only what fraction of the very top is active. For a screening campaign that can afford to
+assay the top 1% of a library, EF@1% is the operative number, and there similarity search is
+consistently ahead.
+
+The honest reading is that random forest spreads its advantage across the early ranks without
+improving the extreme top, which is the part that gets tested.
+
+### Finding 2 — the similarity baseline strengthens with more reference actives
+
+The benchmark was first run with a 20,000-molecule decoy pool, which caps Track B at ~100
+actives and leaves only 12-36 in the test set after splitting. Re-running at 100,000 raised
+this to 69-179. The baseline moved sharply:
+
+| target | max Tanimoto BEDROC (20k pool) | (100k pool) | change | test actives |
+|---|---|---|---|---|
+| D2 | 0.740 | 0.927 | **+0.187** | 36 → 179 |
+| MAO-B | 0.778 | 0.874 | **+0.096** | 12 → 69 |
+| 5-HT1A | 0.829 | 0.962 | **+0.133** | 35 → 175 |
+
+Nearest-neighbour search benefits directly from denser coverage of chemical space: more
+reference actives means a closer nearest neighbour for any given query. A benchmark that gives
+the baseline few actives is measuring a handicapped baseline, and will overstate how much any
+model adds on top of it.
+
+At the 20k pool the earlier run reported "no model beat similarity" on two targets. That
+conclusion was not wrong so much as unsupported — 12 test actives cannot resolve a difference
+of a few BEDROC points either way.
+
+### Finding 3 — the method is far better at "right neighbourhood" than "which analog binds"
+
+The headline Track B numbers describe an easy discrimination: separating actives from
+property-matched compounds drawn at random from ChEMBL. Separating actives from compounds
+that were *measured and found inactive* against the same target is a different and much
+harder task, because those inactives are typically close analogs from the same SAR campaign.
+
+Measured directly, scaffold split, shipped method:
+
+| task | target | ROC-AUC |
+|---|---|---|
+| actives vs random library compounds | MAO-B (Track B) | **0.962** |
+| actives vs **measured inactives** | MAO-B (Track A) | **0.794** |
+
+On a spot check with 100 D2 reference actives, held-out real actives averaged 0.362
+similarity while real measured inactives averaged 0.334 — a gap of under 0.03. Unrelated
+drugs and solvents averaged 0.135, an order of magnitude clearer separation.
+
+This is the activity-cliff problem, and it is intrinsic to similarity-based scoring: two
+molecules differing by one substituent are near-identical by fingerprint while differing by
+orders of magnitude in affinity.
+
+**Practical consequence.** The method is well suited to triaging a large diverse library down
+to the right chemical neighbourhood. It is considerably weaker at lead optimisation — picking
+the winner among close analogs — and should not be relied on for that.
+
+### Finding 4 — Track A is degenerate for well-studied targets
+
+For D2 and 5-HT1A, ChEMBL holds ~3,400 actives against 350-500 measured inactives. The test
+set lands at ~82% actives, where a *random* ranking already scores 0.813-0.817 BEDROC and
+EF@1% cannot exceed 1.22. There is almost no dynamic range for a method to demonstrate
+anything, and on 5-HT1A three methods tie at a perfect 1.000.
+
+Those splits are reported but marked low-information. MAO-B is the exception (31.6% test
+actives) because MAO-B inhibitor papers do publish negative results.
+
+This is publication bias made visible: the better-studied the target, the less usable its
+measured-inactive set is for benchmarking.
+
+## What shipped, and why
+
+**Similarity search**, exposed at `POST /screen`.
+
+It beat random and the descriptor score outside the confidence interval on every split of
+every target, it wins the operative metric (EF@1%) on all three targets, and it requires no
+training step, no model artifact, no versioning, and no retraining as ChEMBL grows. Its score
+is also directly inspectable — every prediction reports which known active it matched.
+
+Random forest was **not** shipped. Its BEDROC edge is real on two targets but does not
+replicate on the third, does not appear in early enrichment at all, and would carry
+substantially more operational cost.
+
+The linear SVM initially failed to converge at Track B scale (liblinear hitting its default
+1000-iteration cap), which silently produced a fitted-looking model whose scores were
+meaningless. Fixed by raising max_iter and selecting the primal solver.
+
+## Limitations
+
+Stated plainly, because the result is easy to oversell:
+
+- **Retrospective, not prospective.** Benchmark performance systematically overestimates what
+  happens on genuinely novel chemistry.
+- **Weak within a congeneric series.** See Finding 3: ROC-AUC drops from 0.962 against random
+  library compounds to 0.794 against measured inactives. Use it to find the neighbourhood,
+  not to pick the winner inside one.
+- **Only works where actives already exist.** The method is nearest-neighbour to known
+  binders; it has nothing to say about a target with no ChEMBL data, and its quality degrades
+  as the reference set thins.
+- **Decoys are presumed inactive, not measured inactive.** A decoy that in truth binds is a
+  false negative invisible to this evaluation.
+- **Three targets, all CNS, all aminergic GPCRs or a monoamine oxidase.** Generalisation to
+  other target classes is untested.
+- **Nothing here addresses selectivity, toxicity, ADMET, or synthesizability.** The output is
+  a prioritisation signal, not a drug candidate.
+- **BBB descriptor rules remain unvalidated.** The developability score is still reported but
+  has not been tested against measured brain penetration, and should be read as a flag rather
+  than a verdict.
+- **No experimental validation.** Nothing in this report is wet-lab evidence.
+
+## Reproducing
+
+```bash
+cd backend
+uv sync --group dev
+uv run python -m backend.science.cli --panel --decoy-pool 100000
+
+# Verify reproducibility: identical numbers, no network
+NEUROLAB_OFFLINE=1 uv run python -m backend.science.cli --panel --decoy-pool 100000
+```
+
+Every dataset and report is stamped with the ChEMBL release and the random seed. Raw API
+responses are cached to `backend/data/cache/`, so an offline re-run reproduces byte-identical
+metrics — verified, not asserted.
