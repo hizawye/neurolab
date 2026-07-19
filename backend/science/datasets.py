@@ -214,6 +214,13 @@ def fetch_decoy_pool(
     return pool
 
 
+def _generator_fp(mol):
+    """ECFP4 from an already-parsed molecule, avoiding a second SMILES parse."""
+    from .featurizers import _generator
+
+    return _generator.GetFingerprint(mol)
+
+
 def _properties(smiles: str) -> tuple | None:
     """Physicochemical profile a decoy must match."""
     mol = Chem.MolFromSmiles(smiles)
@@ -249,7 +256,10 @@ def build_decoy_dataset(
     win by learning "actives are heavier", and required to be dissimilar by
     ECFP4 Tanimoto so a matched decoy is not just an unlabelled active.
     """
-    from .featurizers import ecfp4, tanimoto
+    import numpy as np
+    from rdkit import DataStructs
+
+    from .featurizers import ecfp4
 
     rng = random.Random(seed)
     active_props = [(c, _properties(c.smiles)) for c in actives]
@@ -263,7 +273,15 @@ def build_decoy_dataset(
     if len(active_props) > max_actives:
         active_props = rng.sample(active_props, max_actives)
 
-    active_fps = [ecfp4(c.smiles) for c, _ in active_props]
+    active_fps = [fp for fp in (ecfp4(c.smiles) for c, _ in active_props) if fp is not None]
+
+    # Matching is O(candidates x actives), which at pool sizes large enough to
+    # give a well-powered test set is millions of comparisons. Both inner loops
+    # are pushed into compiled code: property distance via numpy broadcasting,
+    # similarity via RDKit's bulk C++ kernel. Same filter, same results.
+    active_matrix = np.array([p[:5] for _, p in active_props], dtype=float)
+    active_charges = np.array([p[5] for _, p in active_props], dtype=int)
+    scales = np.array([50.0, 1.0, 1.0, 2.0, 2.0], dtype=float)
 
     needed = int(len(active_props) / active_fraction) - len(active_props)
     candidates = list(decoy_pool)
@@ -276,21 +294,30 @@ def build_decoy_dataset(
             break
         if molecule_id in seen:
             continue
-        props = _properties(smiles)
-        if props is None:
-            continue
 
-        nearest = min(
-            range(len(active_props)),
-            key=lambda i: _property_distance(props, active_props[i][1]),
+        # Parse once; _properties and ecfp4 would each re-parse the SMILES.
+        mol = Chem.MolFromSmiles(smiles)
+        if mol is None:
+            continue
+        props = (
+            Descriptors.MolWt(mol),
+            Crippen.MolLogP(mol),
+            Lipinski.NumHDonors(mol),
+            Lipinski.NumHAcceptors(mol),
+            rdMolDescriptors.CalcNumRotatableBonds(mol),
         )
-        if _property_distance(props, active_props[nearest][1]) > 4.0:
+        charge = Chem.GetFormalCharge(mol)
+
+        # Charge must match exactly; distance is scaled L1 over the rest.
+        eligible = active_charges == charge
+        if not eligible.any():
+            continue
+        distances = np.abs(active_matrix[eligible] - np.array(props)) / scales
+        if distances.sum(axis=1).min() > 4.0:
             continue
 
-        fingerprint = ecfp4(smiles)
-        if fingerprint is None:
-            continue
-        if max(tanimoto(fingerprint, fp) for fp in active_fps if fp is not None) >= DECOY_MAX_TANIMOTO:
+        fingerprint = _generator_fp(mol)
+        if max(DataStructs.BulkTanimotoSimilarity(fingerprint, active_fps)) >= DECOY_MAX_TANIMOTO:
             continue
 
         seen.add(molecule_id)
