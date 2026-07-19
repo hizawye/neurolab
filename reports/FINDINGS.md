@@ -291,6 +291,57 @@ what could be looked up:
 The harness now discovers the ligand from the structure and takes bond orders from RCSB
 rather than accepting them by hand.
 
+## Docking versus similarity: docking loses, including where it should have won
+
+With the setup validated by redocking, the question is whether docking earns its cost against
+the method already shipped. Both ranked the identical 1,995 compounds for MAO-B — 145
+held-out actives and 1,850 property-matched decoys. Docking took **236 minutes**; similarity
+took milliseconds.
+
+| method | BEDROC | 95% CI | EF@1% | EF@5% | ROC-AUC |
+|---|---|---|---|---|---|
+| similarity | **0.887** | [0.843, 0.924] | 13.8 | 12.9 | 0.953 |
+| docking | 0.273 | [0.207, 0.340] | 3.4 | 2.6 | 0.773 |
+
+The intervals do not overlap. Docking loses decisively.
+
+(EF@1% for similarity is at its ceiling: at a 7.3% active ratio the maximum possible is 13.8,
+so essentially the entire top 1% is active. EF cannot discriminate further here, which is why
+BEDROC carries the comparison.)
+
+### The hypothesis was refuted
+
+This run existed to test a specific prediction: similarity search cannot see past resemblance,
+so docking — which scores a pose against a protein and is indifferent to whether a ligand
+resembles anything known — should have an advantage on unfamiliar chemistry. That prediction
+was stated before the run.
+
+| novelty bin | n | actives | similarity | docking |
+|---|---|---|---|---|
+| dissimilar (<0.5) | 1897 | 53 | **0.549** | 0.209 |
+| close analog (≥0.5) | 98 | 92 | **0.997** | 0.963 |
+
+It is wrong. Docking loses in *both* bins, including the one where it was supposed to win.
+
+The half of the hypothesis about similarity is confirmed — it degrades sharply on unfamiliar
+compounds, 0.997 → 0.549. That weakness is real. But docking does not fill the gap; it
+degrades further still, 0.963 → 0.209. Whatever is hard about those compounds is hard for
+both methods, and structure-based scoring does not rescue it.
+
+### What this does and does not license
+
+**Does:** docking is not shipped. On the evidence it costs roughly six orders of magnitude
+more compute per compound and ranks worse, on the only target eligible to be tested.
+
+**Does not:** this is one docking configuration — smina's default scoring function, rigid
+receptor, exhaustiveness 8, single structure, no rescoring. It is not a verdict on docking as
+a technique. Ensemble docking, induced-fit protocols, and ML-based rescoring functions all
+exist and are not tested here. The honest claim is that *this* setup does not beat similarity
+search for *this* target under *these* conditions.
+
+Also one target, and 53 actives in the bin that mattered. Above the power threshold, but not
+by much.
+
 ## What shipped, and why
 
 **Similarity search**, exposed at `POST /screen`.
