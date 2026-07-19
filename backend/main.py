@@ -3,13 +3,14 @@ import os
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
-from .api import ligands, targets, workflows
+from .api import ligands, screen, targets, workflows
 
 app = FastAPI(title="NeuroLab API", version="0.1.0")
 
 app.include_router(targets.router)
 app.include_router(ligands.router)
 app.include_router(workflows.router)
+app.include_router(screen.router)
 
 cors_origins = [
     origin.strip()

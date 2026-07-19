@@ -1,5 +1,6 @@
 import { BrowserRouter, NavLink, Route, Routes } from 'react-router-dom';
 import Home from './pages/Home';
+import Screen from './pages/Screen';
 import WorkflowBuilder from './pages/WorkflowBuilder';
 import DockingVisualizer from './pages/DockingVisualizer';
 import MoleculeEditor from './pages/MoleculeEditor';
@@ -8,6 +9,7 @@ import './App.css';
 
 const navItems = [
   { to: '/', label: 'Workflow' },
+  { to: '/screen', label: 'Screen' },
   { to: '/workflow', label: 'Builder' },
   { to: '/docking', label: 'Docking' },
   { to: '/editor', label: 'Molecules' },
@@ -48,7 +50,8 @@ function App() {
       <main className="mx-auto max-w-7xl px-5 py-6">
         <Routes>
           <Route path="/" element={<Home />} />
-          <Route path="/workflow" element={<WorkflowBuilder />} />
+          <Route path="/screen" element={<Screen />} />
+        <Route path="/workflow" element={<WorkflowBuilder />} />
           <Route path="/docking" element={<DockingVisualizer />} />
           <Route path="/editor" element={<MoleculeEditor />} />
           <Route path="/results" element={<ResultsDashboard />} />

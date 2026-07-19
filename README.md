@@ -146,6 +146,24 @@ Returns RCSB PDB structure candidates.
 Resolves the query to a ChEMBL target and returns its known binders, most potent first,
 with descriptors and measured affinity. Responds 404 if no target matches.
 
+### `POST /screen`
+
+Scores user-supplied compounds against a target's known binders. This is the endpoint that
+makes a prediction — the workflow endpoint below only retrieves what is already known.
+
+```json
+{
+  "target_query": "dopamine D2 receptor",
+  "smiles": ["O=C1NC=NN1c1ccc(cc1)C1CCN(CCCC(=O)c2ccc(F)cc2)CC1"],
+  "reference_limit": 100
+}
+```
+
+Returns each compound's predicted similarity to the nearest known active, which reference it
+matched, its descriptors, and — when the compound already has ChEMBL data — its *measured*
+affinity, kept in a separate field so a measurement is never presented as a prediction. Every
+response carries the scoring method's held-out benchmark numbers.
+
 ### `POST /workflows/run-lite`
 
 Runs the MVP workflow.
