@@ -18,3 +18,6 @@ venv/
 data/
 *.log
 .DS_Store
+
+# Docking binary: fetched, not vendored (see scripts/fetch_smina.sh)
+backend/bin/

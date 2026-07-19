@@ -220,6 +220,46 @@ where similarity search won and the ML did not ship. The principle is identical 
 — the evidence decides — and the difference is the margin: 0.13 with disjoint intervals here
 against ~0.03 with a contrary early-enrichment result there.
 
+## Docking: validated on 2 of 3 targets
+
+Docking was added only after the ligand-based methods were benchmarked, so it has something
+to be measured against. Before scoring any unknown, the setup must reproduce a pose whose
+answer is already known: rebuild a co-crystal ligand from SMILES alone, dock it back into its
+own structure, and measure the distance to the crystallographic pose. Under 2 Å is the
+accepted standard.
+
+| target | PDB | ligand | top affinity | crystal-pose affinity | top RMSD | best RMSD | result |
+|---|---|---|---|---|---|---|---|
+| MAO-B | 2V5Z | SAG (safinamide) | −10.09 | −9.21 | **1.40 Å** | 0.64 Å | PASS |
+| D2 | 6CM4 | 8NU (risperidone) | −11.86 | −11.04 | **0.62 Å** | 0.62 Å | PASS |
+| 5-HT1A | 7E2Z | 9SC (aripiprazole) | −8.64 | −7.56 | 6.54 Å | 5.53 Å | **FAIL** |
+
+**The 5-HT1A failure is a scoring failure, not a search failure**, and the distinction is
+diagnosable. Scoring the crystal pose in place gives −7.56, and it stays put under local
+minimisation (0.60 Å drift). Docking found poses at −8.64. So the search worked fine and the
+scoring function genuinely prefers a wrong pose to the experimental one. Quadrupling
+exhaustiveness from 16 to 64 changed nothing (best RMSD 5.53 → 5.33 Å), which is what the
+diagnosis predicts: more sampling cannot fix a scoring function that ranks the truth second.
+
+This is a well-documented limitation of empirical docking scoring functions, and it is the
+reason a docking score should not be trusted on a novel target without first checking that
+target can be redocked.
+
+### Two setup errors worth recording
+
+Both produced confident numbers about the wrong molecule, and both came from hand-writing
+what could be looked up:
+
+- The 5-HT1A entry originally pointed at **chain A, which is the G protein**, not the
+  receptor (chain R) — the same trap as PDB 7CMU, whose first entity is a G protein.
+- The largest HET group in that structure is **PIP₂, a membrane lipid**, which a naive
+  "biggest ligand wins" rule selects as though it were a drug.
+- A hand-written risperidone SMILES caused D2 to fail at 10.34 Å. Fetching the authoritative
+  SMILES from RCSB's chemical dictionary moved it to **0.62 Å**.
+
+The harness now discovers the ligand from the structure and takes bond orders from RCSB
+rather than accepting them by hand.
+
 ## What shipped, and why
 
 **Similarity search**, exposed at `POST /screen`.

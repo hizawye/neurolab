@@ -19,7 +19,9 @@ dependencies = [
 
 [dependency-groups]
 dev = [
+    "gemmi>=0.7.5",
     "httpx>=0.27.0,<1.0.0",
+    "meeko>=0.7.1",
     "pandas>=2.3.3",
     "pytest>=8.0.0,<9.0.0",
     "scikit-learn>=1.7.2",

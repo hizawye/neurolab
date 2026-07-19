@@ -77,6 +77,31 @@ Design decisions that make the numbers mean something:
 - **BEDROC's random reference is not 0.5.** It depends on the active ratio (~0.12 at 10%
   actives, ~0.05 at 0.5%). Each report states its own reference.
 
+## Docking
+
+Structure-based docking via smina, added after the ligand-based methods were benchmarked so
+it has a baseline to be judged against.
+
+```bash
+./scripts/fetch_smina.sh                              # ~10 MB binary, not vendored
+cd backend
+uv run python -m backend.science.redock               # redocking validation
+```
+
+Redocking validates the setup before any unknown is scored: a co-crystal ligand is rebuilt
+from SMILES alone, docked back into its own structure, and compared to the crystallographic
+pose. MAO-B (1.40 A) and D2 (0.62 A) pass; 5-HT1A fails at 6.54 A.
+
+That failure is diagnosed rather than merely recorded. The harness also scores the crystal
+pose in place, which separates a **scoring failure** (docking found a pose it rates better
+than the experimental truth — more sampling will not help) from a **search failure** (nothing
+sampled reached the crystal pose). 5-HT1A is the former, and quadrupling search effort
+confirms it: no improvement.
+
+Receptor preparation keeps cofactors and discards waters, membrane lipids and detergents.
+Both halves matter: stripping MAO-B's FAD would open a cavity that does not exist, and the
+largest HET group in a GPCR structure is frequently a lipid rather than the drug.
+
 ## BBB prediction
 
 The developability score was benchmarked against B3DB (7,807 compounds with measured

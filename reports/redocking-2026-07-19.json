@@ -1,0 +1,55 @@
+{
+  "metadata": {
+    "chembl_release": "ChEMBL_37",
+    "seed": 20260718,
+    "generated_at": "2026-07-19T02:04:26.476062+00:00",
+    "rmsd_threshold": 2.0
+  },
+  "outcomes": [
+    {
+      "target": "CHEMBL2039",
+      "name": "MAO-B",
+      "pdb": "2V5Z",
+      "ligand_code": "SAG",
+      "ligand_name": "SAG",
+      "top_affinity": -10.08986,
+      "top_rmsd": 1.3965079231946587,
+      "best_rmsd": 0.6363769444712383,
+      "crystal_affinity": -9.21386,
+      "failure_mode": null,
+      "n_poses": 8,
+      "succeeded": true,
+      "note": ""
+    },
+    {
+      "target": "CHEMBL217",
+      "name": "Dopamine D2 receptor",
+      "pdb": "6CM4",
+      "ligand_code": "8NU",
+      "ligand_name": "8NU",
+      "top_affinity": -11.86148,
+      "top_rmsd": 0.6184790360230489,
+      "best_rmsd": 0.6184790360230489,
+      "crystal_affinity": -11.03608,
+      "failure_mode": null,
+      "n_poses": 9,
+      "succeeded": true,
+      "note": ""
+    },
+    {
+      "target": "CHEMBL214",
+      "name": "5-HT1A receptor",
+      "pdb": "7E2Z",
+      "ligand_code": "9SC",
+      "ligand_name": "9SC",
+      "top_affinity": -8.63948,
+      "top_rmsd": 6.543933922190843,
+      "best_rmsd": 5.526741798835911,
+      "crystal_affinity": -7.55969,
+      "failure_mode": "scoring",
+      "n_poses": 9,
+      "succeeded": false,
+      "note": ""
+    }
+  ]
+}
