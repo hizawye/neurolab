@@ -1,15 +1,148 @@
 @import "tailwindcss";
 
+/* Design tokens.
+
+   Colour in this interface is semantic, never decorative. Two hues carry the
+   distinction the whole platform is built on — a measured value and a predicted
+   one are different kinds of claim and must never be read as the same thing:
+
+     measured  -> blue,    filled marks
+     predicted -> magenta, outlined marks
+
+   The pair was validated with the data-viz palette checker rather than chosen by
+   eye: all-pairs CVD deltaE 13.0 light / 15.9 dark, normal-vision 27.5 / 26.5,
+   against both surfaces. Magenta sits below 3:1 on the light surface, so a
+   predicted mark is always accompanied by the outline treatment and a text
+   label — hue never carries the meaning alone.
+
+   Status hues (good/warn/critical) are reserved and never reused as accents. */
+
+@theme inline {
+  --color-plane: var(--nl-plane);
+  --color-surface: var(--nl-surface);
+  --color-ink: var(--nl-ink);
+  --color-ink-2: var(--nl-ink-2);
+  --color-muted: var(--nl-muted);
+  --color-line: var(--nl-line);
+  --color-line-strong: var(--nl-line-strong);
+
+  --color-measured: var(--nl-measured);
+  --color-measured-ink: var(--nl-measured-ink);
+  --color-measured-wash: var(--nl-measured-wash);
+
+  --color-predicted: var(--nl-predicted);
+  --color-predicted-ink: var(--nl-predicted-ink);
+  --color-predicted-wash: var(--nl-predicted-wash);
+
+  --color-good: var(--nl-good);
+  --color-good-ink: var(--nl-good-ink);
+  --color-warn: var(--nl-warn);
+  --color-warn-ink: var(--nl-warn-ink);
+  --color-warn-wash: var(--nl-warn-wash);
+  --color-critical: var(--nl-critical);
+  --color-critical-ink: var(--nl-critical-ink);
+  --color-critical-wash: var(--nl-critical-wash);
+
+  --font-mono: ui-monospace, "SF Mono", "JetBrains Mono", Menlo, Consolas, monospace;
+}
+
 :root {
-  color: #111827;
-  background: #f7f8fb;
-  font-family:
-    Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI",
-    sans-serif;
+  color-scheme: light;
+
+  --nl-plane: #f9f9f7;
+  --nl-surface: #fcfcfb;
+  --nl-ink: #0b0b0b;
+  --nl-ink-2: #52514e;
+  --nl-muted: #898781;
+  --nl-line: #e1e0d9;
+  --nl-line-strong: #c3c2b7;
+
+  --nl-measured: #2a78d6;
+  --nl-measured-ink: #1c5cab;
+  --nl-measured-wash: #eaf2fd;
+
+  --nl-predicted: #e87ba4;
+  --nl-predicted-ink: #a8305a;
+  --nl-predicted-wash: #fdeef4;
+
+  --nl-good: #0ca30c;
+  --nl-good-ink: #006300;
+  --nl-warn: #fab219;
+  --nl-warn-ink: #8a6100;
+  --nl-warn-wash: #fdf5e3;
+  --nl-critical: #d03b3b;
+  --nl-critical-ink: #d03b3b;
+  --nl-critical-wash: #fceded;
+
+  color: var(--nl-ink);
+  background: var(--nl-plane);
+  font-family: system-ui, -apple-system, "Segoe UI", sans-serif;
   font-synthesis: none;
   text-rendering: optimizeLegibility;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+}
+
+/* Dark steps are selected for the dark surface and validated as their own set,
+   not an automatic inversion of the light values. */
+@media (prefers-color-scheme: dark) {
+  :root:where(:not([data-theme="light"])) {
+    color-scheme: dark;
+
+    --nl-plane: #0d0d0d;
+    --nl-surface: #1a1a19;
+    --nl-ink: #ffffff;
+    --nl-ink-2: #c3c2b7;
+    --nl-muted: #898781;
+    --nl-line: #2c2c2a;
+    --nl-line-strong: #383835;
+
+    --nl-measured: #3987e5;
+    --nl-measured-ink: #86b6ef;
+    --nl-measured-wash: #12233a;
+
+    --nl-predicted: #d55181;
+    --nl-predicted-ink: #e87ba4;
+    --nl-predicted-wash: #331520;
+
+    --nl-good: #0ca30c;
+    --nl-good-ink: #0ca30c;
+    --nl-warn: #fab219;
+    --nl-warn-ink: #fab219;
+    --nl-warn-wash: #2e2410;
+    --nl-critical: #e66767;
+    --nl-critical-ink: #e66767;
+    --nl-critical-wash: #2f1717;
+  }
+}
+
+:root[data-theme="dark"] {
+  color-scheme: dark;
+
+  --nl-plane: #0d0d0d;
+  --nl-surface: #1a1a19;
+  --nl-ink: #ffffff;
+  --nl-ink-2: #c3c2b7;
+  --nl-muted: #898781;
+  --nl-line: #2c2c2a;
+  --nl-line-strong: #383835;
+
+  --nl-measured: #3987e5;
+  --nl-measured-ink: #86b6ef;
+  --nl-measured-wash: #12233a;
+
+  --nl-predicted: #d55181;
+  --nl-predicted-ink: #e87ba4;
+  --nl-predicted-wash: #331520;
+
+  --nl-good: #0ca30c;
+  --nl-good-ink: #0ca30c;
+  --nl-warn: #fab219;
+  --nl-warn-ink: #fab219;
+  --nl-warn-wash: #2e2410;
+  --nl-critical: #e66767;
+  --nl-critical-ink: #e66767;
+  --nl-critical-wash: #2f1717;
 }
 
 * {
@@ -23,6 +156,19 @@ body {
 }
 
 button,
-input {
+input,
+textarea,
+select {
   font: inherit;
+}
+
+/* Quantities line up column-wise; a table of affinities is meant to be scanned
+   down, which proportional figures make harder. */
+.tnum {
+  font-variant-numeric: tabular-nums;
+}
+
+:focus-visible {
+  outline: 2px solid var(--nl-measured);
+  outline-offset: 2px;
 }
